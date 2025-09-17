@@ -1,5 +1,6 @@
 import type { MotionProps, Variants } from "framer-motion";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Menu, MenuItem } from "./Menu";
 
 const menu = {
@@ -30,15 +31,32 @@ const item = {
 
 export default function DropDownMenu({
   onLogout,
-  proileImage,
+  profileImage,
 }: {
   onLogout: () => void;
-  proileImage: React.ReactNode;
+  profileImage: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const handleMyPageClick = () => {
+    router.push("/my-page");
+    setOpen(false);
+  };
+
+  const handleCreateMeetingClick = () => {
+    router.push("/meetings/create");
+    setOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    onLogout();
+    setOpen(false);
+  };
+
   return (
     <Menu
-      profileImage={proileImage}
+      profileImage={profileImage}
       open={open}
       setOpen={setOpen}
       animate={open ? "open" : "closed"}
@@ -46,9 +64,13 @@ export default function DropDownMenu({
       exit="closed"
       variants={menu}
     >
-      <MenuItem {...item}>마이페이지</MenuItem>
-      <MenuItem {...item}>모임 생성</MenuItem>
-      <MenuItem {...item} onClick={onLogout}>
+      <MenuItem {...item} onClick={handleMyPageClick}>
+        마이페이지
+      </MenuItem>
+      {/* <MenuItem {...item} onClick={handleCreateMeetingClick}>
+        모임 생성
+      </MenuItem> */}
+      <MenuItem {...item} onClick={handleLogoutClick}>
         로그아웃
       </MenuItem>
     </Menu>

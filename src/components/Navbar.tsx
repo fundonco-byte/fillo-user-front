@@ -9,6 +9,7 @@ import Image from "next/image";
 import filloLogo from "@/assets/images/fillo_logo.png";
 import LogoutConfirmDialog from "./LogoutConfirmDialog";
 import DropDownMenu from "./DropDownMenu";
+import { DefaultProfile } from "./ui";
 
 const Navbar = () => {
   const router = useRouter();
@@ -53,7 +54,18 @@ const Navbar = () => {
       <div className="container-custom">
         <div className="flex justify-between items-center py-4">
           {/* 로고 */}
-          <Link href="/" className="flex items-center space-x-2">
+          {/* <Link href="/" className="flex items-center space-x-2">
+            <div className="w-120 h-10 flex items-center justify-start">
+              <Image
+                src={filloLogo}
+                alt="Fillo Logo"
+                width={120}
+                height={80}
+                className="object-contain"
+              />
+            </div>
+          </Link> */}
+          <Link href="/pre-register" className="flex items-center space-x-2">
             <div className="w-120 h-10 flex items-center justify-start">
               <Image
                 src={filloLogo}
@@ -67,12 +79,12 @@ const Navbar = () => {
 
           {/* 데스크톱 메뉴 */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
+            {/* <Link
               href="/fandom-meetings"
               className="text-gray-600 hover:text-purple-600 font-medium transition-colors"
             >
               팬덤 모임 찾기
-            </Link>
+            </Link> */}
             {/* <Link
               href="/activity"
               className="text-gray-600 hover:text-purple-600 font-medium transition-colors"
@@ -85,12 +97,12 @@ const Navbar = () => {
             >
               모임
             </Link> */}
-            <Link
+            {/* <Link
               href="/events"
               className="text-gray-600 hover:text-purple-600 font-medium transition-colors"
             >
               이벤트
-            </Link>
+            </Link> */}
           </div>
 
           {/* 검색창과 CTA 버튼 */}
@@ -113,12 +125,18 @@ const Navbar = () => {
               <div>
                 <DropDownMenu
                   onLogout={handleLogoutClick}
-                  proileImage={
-                    <img
-                      src={session.user?.image as string}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md`}
-                      alt="Profile"
-                    />
+                  profileImage={
+                    session.user?.image ? (
+                      <img
+                        src={session.user.image}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md`}
+                        alt="Profile"
+                      />
+                    ) : (
+                      <div className="cursor-pointer hover:scale-105 transition-transform">
+                        <DefaultProfile size="md" />
+                      </div>
+                    )
                   }
                 />
               </div>
@@ -165,7 +183,7 @@ const Navbar = () => {
                 </div>
               </form>
 
-              <Link
+              {/* <Link
                 href="/fandom-meetings"
                 onClick={handleMobileMenuClick}
                 className="text-gray-600 hover:text-purple-800 font-medium transition-colors text-left"
@@ -199,7 +217,7 @@ const Navbar = () => {
                 className="text-gray-600 hover:text-purple-800 font-medium transition-colors text-left"
               >
                 네트워킹
-              </Link>
+              </Link> */}
               <Link
                 href="/meetings"
                 onClick={handleMobileMenuClick}

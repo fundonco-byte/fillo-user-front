@@ -4,15 +4,15 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  /* 서포터즈 하이 브랜드 컬러 - 보라색 테마 */
+  /* Fundon 브랜드 컬러 - Figma 디자인 기반 */
   --color-primary-purple: #9400ea;
-  --color-primary-purple-dark: #7c3aed;
-  --color-primary-purple-light: #a855f7;
-  --color-accent-purple: #8b5cf6;
+  --color-primary-purple-dark: #7e00c6;
+  --color-primary-purple-light: #d9b6f6;
+  --color-accent-teal: #00c2a8;
   --color-accent-pink: #ec4899;
-  --color-neutral-gray: #6b7280;
-  --color-neutral-light: #f8fafc;
-  --color-neutral-dark: #1f2937;
+  --color-neutral-gray: #999999;
+  --color-neutral-light: #fafafa;
+  --color-neutral-dark: #1a1a1a;
 }
 
 @theme {
@@ -21,12 +21,12 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* 브랜드 보라색 컬러 시스템 */
+  /* Fundon 브랜드 컬러 시스템 */
   --color-brand-primary: #9400ea;
-  --color-brand-primary-dark: #7c3aed;
-  --color-brand-primary-light: #a855f7;
-  --color-brand-secondary: #8b5cf6;
-  --color-brand-accent: #ec4899;
+  --color-brand-primary-dark: #7e00c6;
+  --color-brand-primary-light: #d9b6f6;
+  --color-brand-secondary: #5f0095;
+  --color-brand-accent: #00c2a8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,7 +43,10 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR",
+    "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    sans-serif;
   line-height: 1.6;
 }
 
@@ -83,7 +86,7 @@ body {
 }
 
 .btn-primary:hover {
-  background: #7c3aed;
+  background: #7e00c6;
 }
 
 .btn-login {
@@ -99,7 +102,7 @@ body {
 }
 
 .btn-login:hover {
-  background: #7c3aed;
+  background: #7e00c6;
 }
 
 .btn-secondary {

@@ -8,10 +8,35 @@ import { useSession } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
-    console.log("메인 페이지에서 세션 생성 확인 : " + session);
-  }, [session]);
+    // 로그인되지 않은 사용자는 사전등록 페이지로 리다이렉트
+    // if (session === null) {
+    //   router.replace("/pre-register");
+    //   return;
+    // }
+
+    // 사전등록 기간이므로 무조건 사전등록 페이지로 전환시키기
+    // 이후 메인 프로젝트로 전환 시 삭제
+    router.replace("/pre-register");
+  }, [session, router]);
+
+  // 세션 로딩 중이거나 로그인되지 않은 경우
+  if (session === undefined) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-brand-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">페이지를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (session === null) {
+    return null; // 리다이렉트 중
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -35,37 +35,43 @@ const Footer = () => {
               </p>
               <div className="flex space-x-4">
                 <button
-                  onClick={() => handleLinkClick("https://instagram.com")}
+                  onClick={() =>
+                    handleLinkClick(
+                      "https://www.instagram.com/fundon_official/"
+                    )
+                  }
                   className="w-10 h-10 bg-gray-800 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors"
                   tabIndex={0}
                   aria-label="인스타그램 팔로우"
                 >
                   <Instagram className="h-5 w-5" />
                 </button>
-                <button
+                {/* <button
                   onClick={() => handleLinkClick("https://twitter.com")}
                   className="w-10 h-10 bg-gray-800 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors"
                   tabIndex={0}
                   aria-label="트위터 팔로우"
                 >
                   <Twitter className="h-5 w-5" />
-                </button>
+                </button> */}
                 <button
-                  onClick={() => handleLinkClick("https://youtube.com")}
+                  onClick={() =>
+                    handleLinkClick("https://www.youtube.com/@Fundon4824")
+                  }
                   className="w-10 h-10 bg-gray-800 hover:bg-pink-500 rounded-lg flex items-center justify-center transition-colors"
                   tabIndex={0}
                   aria-label="유튜브 구독"
                 >
                   <Youtube className="h-5 w-5" />
                 </button>
-                <button
+                {/* <button
                   onClick={() => handleLinkClick("https://facebook.com")}
                   className="w-10 h-10 bg-gray-800 hover:bg-purple-700 rounded-lg flex items-center justify-center transition-colors"
                   tabIndex={0}
                   aria-label="페이스북 팔로우"
                 >
                   <Facebook className="h-5 w-5" />
-                </button>
+                </button> */}
               </div>
             </div>
 

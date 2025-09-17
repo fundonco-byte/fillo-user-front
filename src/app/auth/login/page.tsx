@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useState, useEffect, useRef } from "react";
+import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import filloLogo from "@/assets/images/fillo_logo.png";
-import { signIn as signInKakao } from "next-auth/react";
 
 const LoginPage = () => {
   const { data: session, status } = useSession();
@@ -16,6 +15,9 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -29,10 +31,47 @@ const LoginPage = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleEmailLogin = (e: React.FormEvent) => {
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 이메일 로그인 로직 구현
-    console.log("이메일 로그인:", { email, password });
+
+    if (!email || !password) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        // 로그인 성공 시 사전 등록 메인 페이지로 이동
+        router.push("/pre-register");
+      } else {
+        // 로그인 실패 시 에러 모달 표시
+        setShowErrorModal(true);
+        // 이메일 입력 칸에 포커스
+        setTimeout(() => {
+          emailInputRef.current?.focus();
+        }, 100);
+      }
+    } catch (error) {
+      console.error("로그인 에러:", error);
+      setShowErrorModal(true);
+      setTimeout(() => {
+        emailInputRef.current?.focus();
+      }, 100);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCloseErrorModal = () => {
+    setShowErrorModal(false);
+    emailInputRef.current?.focus();
   };
 
   // 카카오 로그인이 완료되면 메인 페이지로 이동
@@ -79,6 +118,7 @@ const LoginPage = () => {
                 이메일
               </label>
               <input
+                ref={emailInputRef}
                 id="email"
                 name="email"
                 type="email"
@@ -132,9 +172,10 @@ const LoginPage = () => {
             {/* 로그인 버튼 */}
             <button
               type="submit"
-              className="w-full btn-primary text-lg font-semibold justify-center hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              disabled={isLoading}
+              className="w-full btn-primary text-lg font-semibold justify-center hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              로그인
+              {isLoading ? "로그인 중..." : "로그인"}
             </button>
           </form>
 
@@ -153,8 +194,10 @@ const LoginPage = () => {
           </div>
 
           {/* 카카오 로그인 버튼 */}
+          {/* 현재 사전등록 기간 중이므로 callbackUrl을 /pre-register로 설정 */}
+          {/* 이후 메인 프로젝트로 전환 시 callbackUrl을 /로 설정 */}
           <button
-            onClick={() => signInKakao("kakao", { callbackUrl: "/" })}
+            onClick={() => signIn("kakao", { callbackUrl: "/pre-register" })}
             className="w-full bg-yellow-400 text-gray-900 py-3 px-4 rounded-xl font-semibold text-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
           >
             <span className="text-xl">💬</span>
@@ -195,6 +238,26 @@ const LoginPage = () => {
             에 동의하는 것으로 간주됩니다.
           </p>
         </div>
+
+        {/* 에러 모달 */}
+        {showErrorModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                로그인 실패
+              </h3>
+              <p className="text-gray-600 mb-6">
+                입력한 정보와 일치하는 계정이 존재하지 않습니다
+              </p>
+              <button
+                onClick={handleCloseErrorModal}
+                className="w-full btn-primary"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
