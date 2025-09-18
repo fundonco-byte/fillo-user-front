@@ -5,16 +5,19 @@ import { useRouter } from "next/navigation";
 import { Button, TextInput } from "@/components/ui";
 import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { isValidPassword } from "@/lib/utils";
+import { useApi } from "@/hooks/useApi";
+import { createHeaders } from "@/lib/api";
 
 const PasswordChangePage = () => {
   const router = useRouter();
+  const { data, execute, loading, error } = useApi();
   const [formData, setFormData] = useState({
-    newPassword: "",
-    confirmPassword: "",
+    password: "",
+    checkPassword: "",
   });
   const [showPasswords, setShowPasswords] = useState({
-    newPassword: false,
-    confirmPassword: false,
+    password: false,
+    checkPassword: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -22,17 +25,17 @@ const PasswordChangePage = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.newPassword) {
-      newErrors.newPassword = "새 비밀번호를 입력해주세요.";
-    } else if (!isValidPassword(formData.newPassword)) {
-      newErrors.newPassword =
+    if (!formData.password) {
+      newErrors.password = "새 비밀번호를 입력해주세요.";
+    } else if (!isValidPassword(formData.password)) {
+      newErrors.password =
         "비밀번호는 8자 이상이며, 문자, 숫자, 특수문자를 포함해야 합니다.";
     }
 
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "비밀번호 확인을 입력해주세요.";
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
+    if (!formData.checkPassword) {
+      newErrors.checkPassword = "비밀번호 확인을 입력해주세요.";
+    } else if (formData.password !== formData.checkPassword) {
+      newErrors.checkPassword = "비밀번호가 일치하지 않습니다.";
     }
 
     setErrors(newErrors);
@@ -46,9 +49,7 @@ const PasswordChangePage = () => {
     }
   };
 
-  const togglePasswordVisibility = (
-    field: "newPassword" | "confirmPassword"
-  ) => {
+  const togglePasswordVisibility = (field: "password" | "checkPassword") => {
     setShowPasswords((prev) => ({
       ...prev,
       [field]: !prev[field],
@@ -64,21 +65,24 @@ const PasswordChangePage = () => {
 
     try {
       // 비밀번호 변경 API 호출 (실제 구현 시 필요)
-      // const response = await fetch("http://localhost:8093/api/v1/member/password/change", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     newPassword: formData.newPassword,
-      //   }),
-      // });
+      const response = await execute("/api/v1/member/update/password", {
+        method: "PUT",
+        headers: await createHeaders(true, true),
+        body: JSON.stringify({
+          password: formData.password,
+          checkPassword: formData.checkPassword,
+        }),
+      });
 
-      // 임시로 성공 처리
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
-      router.push("/auth/login");
+      if (typeof response !== "string" && response.statusCode === "FO-200") {
+        const res = response;
+        if (res.statusCode === "FO-200") {
+          alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
+          router.push("/auth/login");
+        }
+      } else {
+        alert("비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
+      }
     } catch (error) {
       console.error("비밀번호 변경 실패:", error);
       alert("비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
@@ -107,7 +111,7 @@ const PasswordChangePage = () => {
     return { strength: 3, text: "강함", color: "text-green-500" };
   };
 
-  const passwordStrength = getPasswordStrength(formData.newPassword);
+  const passwordStrength = getPasswordStrength(formData.password);
 
   return (
     <div className="min-h-screen bg-gray-50 py-16">
@@ -133,24 +137,24 @@ const PasswordChangePage = () => {
                 </label>
                 <div className="relative">
                   <input
-                    type={showPasswords.newPassword ? "text" : "password"}
-                    value={formData.newPassword}
+                    type={showPasswords.password ? "text" : "password"}
+                    value={formData.password}
                     onChange={(e) =>
-                      handleInputChange("newPassword", e.target.value)
+                      handleInputChange("password", e.target.value)
                     }
                     placeholder="새 비밀번호를 입력해주세요"
                     className={`w-full px-4 py-3 pr-12 text-base text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all duration-200 ${
-                      errors.newPassword
+                      errors.password
                         ? "border-accent-error focus:ring-accent-error"
                         : ""
                     }`}
                   />
                   <button
                     type="button"
-                    onClick={() => togglePasswordVisibility("newPassword")}
+                    onClick={() => togglePasswordVisibility("password")}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPasswords.newPassword ? (
+                    {showPasswords.password ? (
                       <EyeOff className="w-5 h-5" />
                     ) : (
                       <Eye className="w-5 h-5" />
@@ -159,7 +163,7 @@ const PasswordChangePage = () => {
                 </div>
 
                 {/* 비밀번호 강도 표시 */}
-                {formData.newPassword && (
+                {formData.password && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-gray-500">
@@ -188,9 +192,9 @@ const PasswordChangePage = () => {
                   </div>
                 )}
 
-                {errors.newPassword && (
+                {errors.password && (
                   <p className="text-sm text-accent-error mt-2">
-                    {errors.newPassword}
+                    {errors.password}
                   </p>
                 )}
               </div>
@@ -202,24 +206,24 @@ const PasswordChangePage = () => {
                 </label>
                 <div className="relative">
                   <input
-                    type={showPasswords.confirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
+                    type={showPasswords.checkPassword ? "text" : "password"}
+                    value={formData.checkPassword}
                     onChange={(e) =>
-                      handleInputChange("confirmPassword", e.target.value)
+                      handleInputChange("checkPassword", e.target.value)
                     }
                     placeholder="비밀번호를 다시 입력해주세요"
                     className={`w-full px-4 py-3 pr-12 text-base text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all duration-200 ${
-                      errors.confirmPassword
+                      errors.checkPassword
                         ? "border-accent-error focus:ring-accent-error"
                         : ""
                     }`}
                   />
                   <button
                     type="button"
-                    onClick={() => togglePasswordVisibility("confirmPassword")}
+                    onClick={() => togglePasswordVisibility("checkPassword")}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPasswords.confirmPassword ? (
+                    {showPasswords.checkPassword ? (
                       <EyeOff className="w-5 h-5" />
                     ) : (
                       <Eye className="w-5 h-5" />
@@ -228,9 +232,9 @@ const PasswordChangePage = () => {
                 </div>
 
                 {/* 일치 확인 표시 */}
-                {formData.confirmPassword && formData.newPassword && (
+                {formData.checkPassword && formData.password && (
                   <div className="mt-2 flex items-center">
-                    {formData.newPassword === formData.confirmPassword ? (
+                    {formData.password === formData.checkPassword ? (
                       <div className="flex items-center text-green-500">
                         <CheckCircle className="w-4 h-4 mr-1" />
                         <span className="text-xs">비밀번호가 일치합니다</span>
@@ -243,9 +247,9 @@ const PasswordChangePage = () => {
                   </div>
                 )}
 
-                {errors.confirmPassword && (
+                {errors.checkPassword && (
                   <p className="text-sm text-accent-error mt-2">
-                    {errors.confirmPassword}
+                    {errors.checkPassword}
                   </p>
                 )}
               </div>

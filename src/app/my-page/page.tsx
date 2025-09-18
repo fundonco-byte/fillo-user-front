@@ -473,22 +473,25 @@ const MyPage = () => {
         marketingAgreement: editForm.marketingAgreement === "y" ? "y" : "n",
       };
 
-      // JSON 데이터를 추가
-      formData.append("updateInfo", JSON.stringify(jsonData));
-
       // 프로필 이미지 파일 추가 (있을 경우)
       if (profileImage) {
         formData.append("profileImage", profileImage);
       }
 
+      // JSON 데이터를 추가
+      formData.append(
+        "updateInfo",
+        new Blob([JSON.stringify(jsonData)], { type: "application/json" })
+      );
+
       const response = await execute("/api/v1/member/update", {
         method: "PUT",
-        headers: await createHeaders(true),
+        headers: await createHeaders(true), // apiRequest에서 FormData 감지하여 Content-Type 자동 제거
         body: formData,
       });
 
       if (typeof response !== "string" && response.statusCode === "FO-200") {
-        const res = response.data;
+        const res = response;
         if (res.statusCode === "FO-200") {
           // 성공 시 마이페이지로 리다이렉트
           setIsEditing(false);

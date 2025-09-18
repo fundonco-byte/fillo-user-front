@@ -3,6 +3,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NextAuthSessionProvider from "./session-provider";
+import { GlobalErrorProvider } from "@/context/GlobalErrorContext";
+import GlobalErrorInitializer from "@/components/GlobalErrorInitializer";
 
 export const metadata: Metadata = {
   title: "Fillo",
@@ -48,9 +50,12 @@ export default async function RootLayout({
       </head>
       <body className="antialiased">
         <NextAuthSessionProvider>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <GlobalErrorProvider>
+            <GlobalErrorInitializer />
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </GlobalErrorProvider>
         </NextAuthSessionProvider>
       </body>
     </html>

@@ -1,16 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui";
 import { ArrowRight, Users } from "lucide-react";
 import { Instagram, Youtube } from "lucide-react";
 import { NoticeTextBalloon } from "@/components/NoticeTextBalloon";
 import { useSession } from "next-auth/react";
+import { apiRequest } from "@/lib/api";
 
 const PreRegisterPage = () => {
   const [currentUsers, setCurrentUsers] = useState(0); // 현재 등록된 사용자 수
+  const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
+
+  // 사전 등록 사용자 수 조회
+  useEffect(() => {
+    const fetchCurrentUsers = async () => {
+      try {
+        setLoading(true);
+        console.log("[API 호출] 사전 등록 사용자 수 조회");
+
+        const response = await apiRequest("/api/v1/member/pre-registration", {
+          method: "GET",
+        });
+
+        console.log("[API 응답] 사전 등록 사용자 수:", response);
+
+        if (
+          response.statusCode === "FO-200" &&
+          typeof response.data === "number"
+        ) {
+          setCurrentUsers(response.data);
+        } else {
+          console.warn("[API 경고] 예상과 다른 응답 형식:", response);
+          // 응답이 예상과 다르면 기본값 유지
+          setCurrentUsers(0);
+        }
+      } catch (error) {
+        console.error("[API 에러] 사전 등록 사용자 수 조회 실패:", error);
+        // 에러 발생 시 기본값 유지
+        setCurrentUsers(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrentUsers();
+  }, []);
 
   const handlePreRegisterClick = () => {
     // 회원가입 페이지로 이동
@@ -106,7 +143,32 @@ const PreRegisterPage = () => {
               <div className="flex items-center justify-center space-x-3 bg-gray-200 rounded-lg px-4 py-2 inline-flex">
                 <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[12px] border-b-gray-600"></div>
                 <span className="text-gray-900 text-sm">
-                  {currentUsers}명이 함께하고 있어요!
+                  {loading ? (
+                    <span className="inline-flex items-center">
+                      <svg
+                        className="animate-spin h-4 w-4 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      로딩 중...
+                    </span>
+                  ) : (
+                    `${currentUsers.toLocaleString()}명이 함께하고 있어요!`
+                  )}
                 </span>
               </div>
             </div>

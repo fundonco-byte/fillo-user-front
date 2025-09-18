@@ -48,6 +48,12 @@ export const useApi = <T = any>(options: UseApiOptions = {}) => {
             return "Token-Expired";
           }
 
+          // FO-999는 이미 apiRequest에서 처리되므로 여기서는 제외
+          if (response.statusCode === "FO-999") {
+            // apiRequest에서 이미 globalErrorHandler가 호출됨
+            throw new Error("Token expired");
+          }
+
           const errorMessage = `API Error: ${response.statusCode} - ${
             response.statusMessage || "알 수 없는 오류"
           }`;

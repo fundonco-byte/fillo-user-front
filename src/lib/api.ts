@@ -80,11 +80,15 @@ export const loadAuthTokens = () => {
 
 // API 요청 헤더 생성
 export const createHeaders = async (
-  includeAuth = true
+  includeAuth = true,
+  includeContentType = true
 ): Promise<Record<string, string>> => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
+
+  // Content-Type 헤더는 FormData 사용 시 제외해야 함 (브라우저가 자동으로 multipart/form-data 설정)
+  if (includeContentType) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (includeAuth) {
     const tokens = await getAuthTokensFromSession();
@@ -128,6 +132,15 @@ export const loginApi = async (
   return { response: data, tokens };
 };
 
+// 전역 에러 핸들러 (토큰 만료 처리용)
+let globalErrorHandler: ((statusCode: string) => void) | null = null;
+
+export const setGlobalErrorHandler = (
+  handler: (statusCode: string) => void
+) => {
+  globalErrorHandler = handler;
+};
+
 // 일반 API 요청 함수 (이후 다른 API 호출시 사용)
 export const apiRequest = async <T = any>(
   endpoint: string,
@@ -138,14 +151,23 @@ export const apiRequest = async <T = any>(
     : `${API_BASE_URL}${endpoint}`;
 
   try {
-    const headers = await createHeaders();
+    // 기본 헤더 생성
+    const defaultHeaders = await createHeaders();
+
+    // 전달받은 헤더와 병합 (전달받은 헤더가 우선)
+    const finalHeaders: Record<string, string> = {
+      ...defaultHeaders,
+      ...(options.headers as Record<string, string>),
+    };
+
+    // FormData를 사용하는 경우 Content-Type 헤더 제거
+    if (options.body instanceof FormData && finalHeaders["Content-Type"]) {
+      delete finalHeaders["Content-Type"];
+    }
 
     const response = await fetch(url, {
       ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
+      headers: finalHeaders,
     });
 
     if (!response.ok) {
@@ -161,7 +183,15 @@ export const apiRequest = async <T = any>(
       );
     }
 
-    return response.json();
+    const result: ApiResponse<T> = await response.json();
+
+    // FO-999 상태 코드 체크 (토큰 이슈)
+    if (result.statusCode === "FO-999" && globalErrorHandler) {
+      globalErrorHandler(result.statusCode);
+      throw new Error("Token expired");
+    }
+
+    return result;
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("fetch")) {
       throw new Error(
