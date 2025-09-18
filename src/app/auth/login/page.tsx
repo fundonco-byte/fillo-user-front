@@ -196,13 +196,13 @@ const LoginPage = () => {
           {/* 카카오 로그인 버튼 */}
           {/* 현재 사전등록 기간 중이므로 callbackUrl을 /pre-register로 설정 */}
           {/* 이후 메인 프로젝트로 전환 시 callbackUrl을 /로 설정 */}
-          <button
+          {/* <button
             onClick={() => signIn("kakao", { callbackUrl: "/pre-register" })}
             className="w-full bg-yellow-400 text-gray-900 py-3 px-4 rounded-xl font-semibold text-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
           >
             <span className="text-xl">💬</span>
             카카오로 로그인
-          </button>
+          </button> */}
 
           {/* 회원가입 링크 */}
           <div className="mt-8 text-center">
