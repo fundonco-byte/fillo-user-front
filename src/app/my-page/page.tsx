@@ -227,6 +227,12 @@ interface UserInfo {
   marketingAgreement: string;
 }
 
+interface DaumPostCode {
+  userSelectedType: string;
+  roadAddress: string;
+  jibunAddress: string;
+}
+
 const MyPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -388,11 +394,11 @@ const MyPage = () => {
 
   // 다음 우편번호 서비스 연동
   const handleAddressSearch = () => {
-    // @ts-ignore
+    // @ts-expect-error
     if (typeof daum !== "undefined" && daum.Postcode) {
-      // @ts-ignore
+      // @ts-expect-error
       new daum.Postcode({
-        oncomplete: function (data: any) {
+        oncomplete: function (data: DaumPostCode) {
           // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
           // 각 주소의 노출 규칙에 따라 주소를 조합한다.
           let addr = ""; // 주소 변수

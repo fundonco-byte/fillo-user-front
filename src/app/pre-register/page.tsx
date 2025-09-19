@@ -309,11 +309,11 @@ const PreRegisterPage = () => {
             <div className="flex flex-col justify-between gap-12 items-center">
               <div className="w-full p-20 gap-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 text-left">
-                  "혼자 직관 가기 아쉽죠?"
+                  &quot;혼자 직관 가기 아쉽죠?&quot;
                 </h2>
                 <div className="h-20 w-full"></div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-8 text-right">
-                  "우리 팀 경기, 같이 응원하는 사람들과 함께 본다면.."
+                  &quot;우리 팀 경기, 같이 응원하는 사람들과 함께 본다면..&quot;
                 </h3>
               </div>
 
@@ -322,7 +322,7 @@ const PreRegisterPage = () => {
                   그래서 필로(Fillo)
                 </h4>
                 <p className="text-3xl lg:text-3xl font-semibold text-gray-900 mb-8">
-                  "우리 팀 경기, 같이 보러갈 팬들이 기다리고 있어요."
+                  &quot;우리 팀 경기, 같이 보러갈 팬들이 기다리고 있어요.&quot;
                 </p>
               </div>
 

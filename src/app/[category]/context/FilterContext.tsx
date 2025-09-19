@@ -10,6 +10,10 @@ import React, {
 import { FilterOptions } from "../components/FilterSection";
 
 interface FilterState extends FilterOptions {
+  region: string;
+  ageGroup: string;
+  category: string;
+  period: string;
   selectedCategory: string;
 }
 

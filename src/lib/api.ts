@@ -105,6 +105,7 @@ export const createHeaders = async (
   return headers;
 };
 
+
 // 로그인 API
 export const loginApi = async (
   loginData: LoginRequest
@@ -122,7 +123,7 @@ export const loginApi = async (
   }
 
   const data: ApiResponse = await response.json();
-
+  
   // 응답 헤더에서 토큰 추출
   const tokens: AuthTokens = {
     authorization: response.headers.get("Authorization") || undefined,
@@ -142,7 +143,7 @@ export const setGlobalErrorHandler = (
 };
 
 // 일반 API 요청 함수 (이후 다른 API 호출시 사용)
-export const apiRequest = async <T = any>(
+export const apiRequest = async <T = unknown>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> => {

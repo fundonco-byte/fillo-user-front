@@ -3,7 +3,7 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   statusMessage: string;
   statusCode: string;
   data: T;

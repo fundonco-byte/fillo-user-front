@@ -242,7 +242,7 @@ const FandomMeetingsPageContent: React.FC = () => {
   const { selectedCategory } = useCategoryContext();
 
   // 적용된 필터를 기반으로 모임 데이터 필터링
-  let filteredMeetings = useMemo(() => {
+  const filteredMeetings = useMemo(() => {
     return allFandomMeetings.filter((meeting) => {
       // 카테고리 필터링 (selectedCategory 또는 appliedFilters.selectedCategory 사용)
       const categoryToFilter = !appliedFilters.selectedCategory.includes("전체")

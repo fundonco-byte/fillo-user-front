@@ -5,11 +5,11 @@ import { apiRequest } from "@/lib/api";
 import { ApiResponse } from "@/types/auth";
 
 interface UseApiOptions {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: unknown) => void;
   onError?: (error: Error) => void;
 }
 
-export const useApi = <T = any>(options: UseApiOptions = {}) => {
+export const useApi = <T = unknown>(options: UseApiOptions = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<T | null>(null);

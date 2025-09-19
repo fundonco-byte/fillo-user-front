@@ -38,10 +38,7 @@ export const formatTime = (seconds: number): string => {
 };
 
 // API 에러 메시지 포맷팅
-export const getErrorMessage = (error: any): string => {
-  if (error?.response?.data?.message) {
-    return error.response.data.message;
-  }
+export const getErrorMessage = (error: Error): string => {
   if (error?.message) {
     return error.message;
   }

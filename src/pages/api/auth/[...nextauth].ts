@@ -5,6 +5,13 @@ import Kakao from "next-auth/providers/kakao";
 import Credentials from "next-auth/providers/credentials";
 import { loginApi } from "@/lib/api";
 
+interface LoginResponse {
+  email: string,
+  name: string,
+  accessToken: string,
+  refreshToken: string
+}
+
 export default NextAuth({
   providers: [
     Kakao({
@@ -30,11 +37,13 @@ export default NextAuth({
           });
 
           if (response.statusCode === "FO-200") {
+            const loginResponseData = response.data as LoginResponse;
+            
             // 성공 시 사용자 정보와 토큰을 반환
             return {
-              id: response.data?.id || credentials.email,
+              id: loginResponseData.email || credentials.email,
               email: credentials.email,
-              name: response.data?.name || "",
+              name: loginResponseData.name || "",
               accessToken: tokens.authorization,
               refreshToken: tokens.refreshToken,
             };
@@ -56,8 +65,8 @@ export default NextAuth({
 
         // Credentials 로그인 시 토큰 정보 저장
         if (account.provider === "credentials" && user) {
-          token.accessToken = (user as any).accessToken;
-          token.refreshToken = (user as any).refreshToken;
+          token.accessToken = user.accessToken;
+          token.refreshToken = user.refreshToken;
         }
       }
       return token;
