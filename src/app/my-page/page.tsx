@@ -228,10 +228,10 @@ interface UserInfo {
 }
 
 interface DaumPostCode {
-  userSelectedType: string,
-  roadAddress: string,
-  jibunAddress: string
-};
+  userSelectedType: string;
+  roadAddress: string;
+  jibunAddress: string;
+}
 
 const MyPage = () => {
   const { data: session, status } = useSession();
@@ -295,7 +295,6 @@ const MyPage = () => {
         const res = response;
 
         if (typeof res !== "string" && res.statusCode === "FO-200") {
-
           const userInfo = res.data as UserInfo;
           if (userInfo) {
             setUserInfo(userInfo);
@@ -390,15 +389,13 @@ const MyPage = () => {
     }
   };
 
-
-
   // 다음 우편번호 서비스 연동
   const handleAddressSearch = () => {
     // @ts-expect-error: 우편 번호 api를 제공하는 플랫폼이 무조건 다음으로 지정했기 때문에
     if (typeof daum !== "undefined" && daum.Postcode) {
       // @ts-expect-error: 우편 번호 api를 제공하는 플랫폼이 무조건 다음으로 지정했기 때문에
       new daum.Postcode({
-        oncomplete: function (data: any) {
+        oncomplete: function (data: DaumPostCode) {
           // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
           // 각 주소의 노출 규칙에 따라 주소를 조합한다.
           let addr = ""; // 주소 변수
