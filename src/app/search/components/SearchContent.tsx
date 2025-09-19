@@ -113,7 +113,7 @@ const allMeetings: MeetingData[] = [
 
 export const SearchContent = () => {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "";
+  const query = searchParams!.get("q") || "";
 
   const [searchResults, setSearchResults] = useState<MeetingData[]>([]);
   const [isLoading, setIsLoading] = useState(true);

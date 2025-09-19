@@ -56,8 +56,10 @@ interface FilterProviderProps {
 export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
   const [tempFilters, setTempFilters] =
     useState<FilterState>(initialFilterState);
-  const [appliedFilters, setAppliedFilters] =
-    useState<AppliedFilters>({ ...initialFilterState, checkApply: false });
+  const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
+    ...initialFilterState,
+    checkApply: false,
+  });
 
   const updateTempFilter = useCallback(
     (key: keyof FilterState, value: string) => {
@@ -76,11 +78,15 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
   const resetFilters = useCallback(() => {
     const resetState = { ...initialFilterState };
     setTempFilters(resetState);
-    setAppliedFilters({...resetState, checkApply: false});
+    setAppliedFilters({ ...resetState, checkApply: false });
   }, []);
 
   const hasUnappliedChanges = useCallback((): boolean => {
-    return JSON.stringify(tempFilters) !== JSON.stringify(appliedFilters);
+    // checkApply 필드를 제외하고 비교
+    const { checkApply, ...appliedFiltersWithoutCheck } = appliedFilters;
+    return (
+      JSON.stringify(tempFilters) !== JSON.stringify(appliedFiltersWithoutCheck)
+    );
   }, [tempFilters, appliedFilters]);
 
   const contextValue: FilterContextType = {

@@ -8,6 +8,7 @@ import FilterSection, {
   FilterOptions,
 } from "../[category]/components/FilterSection";
 import { CategoryProvider } from "../[category]/context/CategoryContext";
+import { FilterProvider } from "../[category]/context/FilterContext";
 import { Menu, X } from "lucide-react";
 
 // 전체 모임 데이터 (기존 데이터를 통합)
@@ -232,88 +233,90 @@ export default function MeetingsPage() {
 
   return (
     <CategoryProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Page Header */}
-        <div className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  전체 모임
-                </h1>
-                <p className="text-lg text-gray-600">
-                  다양한 스포츠와 활동의 모임을 찾아보세요
-                </p>
-              </div>
-
-              {/* 모바일 사이드메뉴 토글 버튼 */}
-              <button
-                onClick={toggleSideMenu}
-                className="lg:hidden p-2 rounded-lg border border-gray-300 hover:bg-gray-50"
-              >
-                {isSideMenuOpen ? (
-                  <X className="h-5 w-5 text-gray-600" />
-                ) : (
-                  <Menu className="h-5 w-5 text-gray-600" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex gap-8">
-            {/* 사이드 메뉴 */}
-            <aside
-              className={`${
-                isSideMenuOpen ? "block" : "hidden"
-              } lg:block lg:w-80 flex-shrink-0`}
-            >
-              <SideMenu
-                activeItem={selectedCategory}
-                onItemClick={handleCategorySelect}
-                className="sticky top-24"
-              />
-            </aside>
-
-            {/* 메인 콘텐츠 */}
-            <main className="flex-1 min-w-0">
-              {/* 필터 섹션 */}
-              <FilterSection
-                onFilterChange={handleFilterChange}
-                totalMeetings={filteredMeetings.length}
-              />
-
-              {/* 모임 그리드 */}
-              {filteredMeetings.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    조건에 맞는 모임이 없어요
-                  </h3>
-                  <p className="text-gray-600">
-                    필터 조건을 변경하거나 초기화해보세요
+      <FilterProvider>
+        <div className="min-h-screen bg-gray-50">
+          {/* Page Header */}
+          <div className="bg-white shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                    전체 모임
+                  </h1>
+                  <p className="text-lg text-gray-600">
+                    다양한 스포츠와 활동의 모임을 찾아보세요
                   </p>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredMeetings.map((meeting) => (
-                    <MeetingCard key={meeting.id} meeting={meeting} />
-                  ))}
-                </div>
-              )}
-            </main>
-          </div>
-        </div>
 
-        {/* 모바일 사이드메뉴 오버레이 */}
-        {isSideMenuOpen && (
-          <div
-            className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-            onClick={toggleSideMenu}
-          />
-        )}
-      </div>
+                {/* 모바일 사이드메뉴 토글 버튼 */}
+                <button
+                  onClick={toggleSideMenu}
+                  className="lg:hidden p-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                >
+                  {isSideMenuOpen ? (
+                    <X className="h-5 w-5 text-gray-600" />
+                  ) : (
+                    <Menu className="h-5 w-5 text-gray-600" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex gap-8">
+              {/* 사이드 메뉴 */}
+              <aside
+                className={`${
+                  isSideMenuOpen ? "block" : "hidden"
+                } lg:block lg:w-80 flex-shrink-0`}
+              >
+                <SideMenu
+                  activeItem={selectedCategory}
+                  onItemClick={handleCategorySelect}
+                  className="sticky top-24"
+                />
+              </aside>
+
+              {/* 메인 콘텐츠 */}
+              <main className="flex-1 min-w-0">
+                {/* 필터 섹션 */}
+                <FilterSection
+                  onFiltersChange={handleFilterChange}
+                  totalMeetings={filteredMeetings.length}
+                />
+
+                {/* 모임 그리드 */}
+                {filteredMeetings.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">🔍</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      조건에 맞는 모임이 없어요
+                    </h3>
+                    <p className="text-gray-600">
+                      필터 조건을 변경하거나 초기화해보세요
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredMeetings.map((meeting) => (
+                      <MeetingCard key={meeting.id} meeting={meeting} />
+                    ))}
+                  </div>
+                )}
+              </main>
+            </div>
+          </div>
+
+          {/* 모바일 사이드메뉴 오버레이 */}
+          {isSideMenuOpen && (
+            <div
+              className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={toggleSideMenu}
+            />
+          )}
+        </div>
+      </FilterProvider>
     </CategoryProvider>
   );
 }

@@ -108,7 +108,7 @@ const Navbar = () => {
           {/* 검색창과 CTA 버튼 */}
           <div className="hidden md:flex items-center space-x-4">
             {/* 검색창 */}
-            <form onSubmit={handleSearchSubmit} className="relative">
+            {/* <form onSubmit={handleSearchSubmit} className="relative">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
@@ -119,7 +119,7 @@ const Navbar = () => {
                   className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm"
                 />
               </div>
-            </form>
+            </form> */}
 
             {session ? (
               <div>

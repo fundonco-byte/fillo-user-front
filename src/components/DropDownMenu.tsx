@@ -64,13 +64,13 @@ export default function DropDownMenu({
       exit="closed"
       variants={menu}
     >
-      <MenuItem {...item} onClick={handleMyPageClick}>
+      <MenuItem {...item} onClick={handleMyPageClick} name="마이페이지">
         마이페이지
       </MenuItem>
       {/* <MenuItem {...item} onClick={handleCreateMeetingClick}>
         모임 생성
       </MenuItem> */}
-      <MenuItem {...item} onClick={handleLogoutClick}>
+      <MenuItem {...item} onClick={handleLogoutClick} name="로그아웃">
         로그아웃
       </MenuItem>
     </Menu>
