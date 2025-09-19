@@ -101,8 +101,8 @@ const MeetingDetailPage = () => {
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
 
   useEffect(() => {
-    if (params.id) {
-      const meetingData = getMockMeetingData(params.id as string);
+    if (params!.id) {
+      const meetingData = getMockMeetingData(params!.id as string);
       setMeeting(meetingData);
       setIsLiked(meetingData.isLiked);
     }
@@ -110,7 +110,7 @@ const MeetingDetailPage = () => {
     if (status === "authenticated") {
       setLoginCheck(true);
     }
-  }, [params.id, session, status]);
+  }, [params!.id, session, status]);
 
   const handleLikeToggle = () => {
     setIsLiked(!isLiked);
