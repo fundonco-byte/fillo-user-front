@@ -3,7 +3,7 @@
 import { LoginRequest, ApiResponse, AuthTokens } from "@/types/auth";
 import { getSession } from "next-auth/react";
 
-const API_BASE_URL = "http://localhost:8093";
+const API_BASE_URL = "http://1.234.75.29:8093";
 
 // 토큰 저장소 (fallback용)
 let authTokens: AuthTokens = {};
@@ -105,7 +105,6 @@ export const createHeaders = async (
   return headers;
 };
 
-
 // 로그인 API
 export const loginApi = async (
   loginData: LoginRequest
@@ -123,7 +122,7 @@ export const loginApi = async (
   }
 
   const data: ApiResponse = await response.json();
-  
+
   // 응답 헤더에서 토큰 추출
   const tokens: AuthTokens = {
     authorization: response.headers.get("Authorization") || undefined,

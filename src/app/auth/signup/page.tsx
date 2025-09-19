@@ -406,7 +406,7 @@ const SignupPage = () => {
 
     try {
       const response = await execute(
-        "http://localhost:8093/api/v1/member/email/authorize",
+        "http://1.234.75.29:8093/api/v1/member/email/authorize",
         {
           method: "POST",
           headers: {
