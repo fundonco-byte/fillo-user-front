@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import filloLogo from "@/assets/images/fillo_logo.png";
+// import filloLogo from "@/assets/images/fillo_logo.png";
 
 const LoginPage = () => {
   const { data: session, status } = useSession();
@@ -91,7 +91,7 @@ const LoginPage = () => {
           {/* 로고와 제목 */}
           <div className="text-center mb-8">
             <Image
-              src={filloLogo}
+              src={"/assets/images/fillo_logo.png"}
               alt="Fillo Logo"
               width={120}
               height={40}

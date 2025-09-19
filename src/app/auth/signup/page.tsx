@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { Eye, EyeOff, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import filloLogo from "@/assets/images/fillo_logo.png";
+// import filloLogo from "@/assets/images/fillo_logo.png";
 import { useApi } from "@/hooks/useApi";
 import { createHeaders } from "@/lib/api";
 // import { ApiResponse, AuthTokens } from "@/types/auth";
@@ -657,7 +657,7 @@ const SignupPage = () => {
         {/* 제목 */}
         <div className="text-center mb-12">
           <Image
-            src={filloLogo}
+            src={"/assets/images/fillo_logo.png"}
             alt="Fillo Logo"
             width={100}
             height={50}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Users, Instagram, Twitter, Youtube, Facebook } from "lucide-react";
-import filloLogo from "@/assets/images/fillo_logo.png";
+// import filloLogo from "@/assets/images/fillo_logo.png";
 import Image from "next/image";
 
 const Footer = () => {
@@ -22,7 +22,7 @@ const Footer = () => {
                   <Users className="h-6 w-6 text-white" />
                 </div> */}
                 <Image
-                  src={filloLogo}
+                  src={"/assets/images/fillo_logo.png"}
                   alt="Fillo Logo"
                   width={120}
                   height={80}

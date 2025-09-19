@@ -6,7 +6,7 @@ import { Menu, X, Users, Zap, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import filloLogo from "@/assets/images/fillo_logo.png";
+// import filloLogo from "@/assets/images/fillo_logo.png";
 import LogoutConfirmDialog from "./LogoutConfirmDialog";
 import DropDownMenu from "./DropDownMenu";
 import { DefaultProfile } from "./ui";
@@ -68,7 +68,7 @@ const Navbar = () => {
           <Link href="/pre-register" className="flex items-center space-x-2">
             <div className="w-120 h-10 flex items-center justify-start">
               <Image
-                src={filloLogo}
+                src={"/assets/images/fillo_logo.png"}
                 alt="Fillo Logo"
                 width={120}
                 height={80}
