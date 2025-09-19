@@ -421,8 +421,9 @@ const SignupPage = () => {
       console.log("이메일 인증 API 응답:", response);
 
       if (typeof response !== "string" && response.statusCode === "FO-200") {
+        const authCode = response.data as string;
         // 인증 성공
-        setAuthCode(response.data);
+        setAuthCode(authCode);
         setTimeLeft(180); // 3분 = 180초
         setIsTimerActive(true);
         alert("인증번호가 이메일로 전송되었습니다.");
@@ -639,7 +640,7 @@ const SignupPage = () => {
         // 회원가입 실패 - 서버에서 반환한 오류 메시지 표시
         const errorMsg =
           typeof response !== "string" && response.data
-            ? response.data
+            ? (response.data as string)
             : "회원가입에 실패했습니다. 다시 시도해주세요.";
         setErrorMessage(errorMsg);
         setShowErrorDialog(true);
