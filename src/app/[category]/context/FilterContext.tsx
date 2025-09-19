@@ -19,6 +19,7 @@ interface FilterState extends FilterOptions {
 
 interface AppliedFilters extends FilterState {
   // 실제 적용된 필터들 (확인 버튼을 눌렀을 때만 적용됨)
+  checkApply: boolean;
 }
 
 interface FilterContextType {
@@ -56,7 +57,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
   const [tempFilters, setTempFilters] =
     useState<FilterState>(initialFilterState);
   const [appliedFilters, setAppliedFilters] =
-    useState<AppliedFilters>(initialFilterState);
+    useState<AppliedFilters>({ ...initialFilterState, checkApply: false });
 
   const updateTempFilter = useCallback(
     (key: keyof FilterState, value: string) => {
@@ -69,13 +70,13 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({ children }) => {
   );
 
   const applyFilters = useCallback(() => {
-    setAppliedFilters({ ...tempFilters });
+    setAppliedFilters({ ...tempFilters, checkApply: true });
   }, [tempFilters]);
 
   const resetFilters = useCallback(() => {
     const resetState = { ...initialFilterState };
     setTempFilters(resetState);
-    setAppliedFilters(resetState);
+    setAppliedFilters({...resetState, checkApply: false});
   }, []);
 
   const hasUnappliedChanges = useCallback((): boolean => {

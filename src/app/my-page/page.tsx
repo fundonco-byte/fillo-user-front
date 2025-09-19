@@ -228,10 +228,10 @@ interface UserInfo {
 }
 
 interface DaumPostCode {
-  userSelectedType: string;
-  roadAddress: string;
-  jibunAddress: string;
-}
+  userSelectedType: string,
+  roadAddress: string,
+  jibunAddress: string
+};
 
 const MyPage = () => {
   const { data: session, status } = useSession();
@@ -295,23 +295,21 @@ const MyPage = () => {
         const res = response;
 
         if (typeof res !== "string" && res.statusCode === "FO-200") {
-          if (res.data) {
-            console.log("받은 사용자 데이터:", res.data);
-            console.log("가입일 원본:", res.data.joinDate);
-            console.log("생년월일 원본:", res.data.birthDate);
 
-            setUserInfo(res.data);
+          const userInfo = res.data as UserInfo;
+          if (userInfo) {
+            setUserInfo(userInfo);
             setEditForm({
-              nickName: res.data.nickName || "",
-              leagueId: res.data.leagueId || 0,
-              leagueName: res.data.leagueName || "",
-              teamId: res.data.teamId || 0,
-              teamName: res.data.teamName || "",
-              personalInfoAgreement: res.data.personalInfoAgreement || "",
-              marketingAgreement: res.data.marketingAgreement || "",
-              phone: res.data.phone || "",
-              birthDate: formatDateForInput(res.data.birthDate),
-              address: res.data.address || "",
+              nickName: userInfo.nickName || "",
+              leagueId: userInfo.leagueId || 0,
+              leagueName: userInfo.leagueName || "",
+              teamId: userInfo.teamId || 0,
+              teamName: userInfo.teamName || "",
+              personalInfoAgreement: userInfo.personalInfoAgreement || "",
+              marketingAgreement: userInfo.marketingAgreement || "",
+              phone: userInfo.phone || "",
+              birthDate: formatDateForInput(userInfo.birthDate),
+              address: userInfo.address || "",
             });
           }
         } else {
@@ -392,13 +390,15 @@ const MyPage = () => {
     }
   };
 
+
+
   // 다음 우편번호 서비스 연동
   const handleAddressSearch = () => {
-    // @ts-expect-error
+    // @ts-expect-error: 우편 번호 api를 제공하는 플랫폼이 무조건 다음으로 지정했기 때문에
     if (typeof daum !== "undefined" && daum.Postcode) {
-      // @ts-expect-error
+      // @ts-expect-error: 우편 번호 api를 제공하는 플랫폼이 무조건 다음으로 지정했기 때문에
       new daum.Postcode({
-        oncomplete: function (data: DaumPostCode) {
+        oncomplete: function (data: any) {
           // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
           // 각 주소의 노출 규칙에 따라 주소를 조합한다.
           let addr = ""; // 주소 변수
