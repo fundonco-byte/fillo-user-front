@@ -280,7 +280,7 @@ export default function MeetingsPage() {
             <main className="flex-1 min-w-0">
               {/* 필터 섹션 */}
               <FilterSection
-                onFilterChange={handleFilterChange}
+                onFiltersChange={handleFilterChange}
                 totalMeetings={filteredMeetings.length}
               />
 
