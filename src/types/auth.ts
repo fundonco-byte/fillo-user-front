@@ -14,6 +14,15 @@ export interface AuthTokens {
   refreshToken?: string;
 }
 
+// 로그인 응답 데이터 타입
+export interface LoginResponseData {
+  email: string;
+  name: string;
+  accessToken: string;
+  refreshToken: string;
+  profileImage?: string;
+}
+
 // NextAuth 타입 확장
 declare module "next-auth" {
   interface Session {
@@ -22,6 +31,7 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      profileImage?: string;
       accessToken?: string;
       refreshToken?: string;
     };
@@ -31,6 +41,7 @@ declare module "next-auth" {
     id: string;
     email: string;
     name: string;
+    profileImage?: string;
     accessToken?: string;
     refreshToken?: string;
   }
@@ -41,5 +52,6 @@ declare module "next-auth/jwt" {
     provider?: string;
     accessToken?: string;
     refreshToken?: string;
+    profileImage?: string;
   }
 }

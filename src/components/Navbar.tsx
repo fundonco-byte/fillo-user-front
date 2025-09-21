@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession, signOut as signOutKakao } from "next-auth/react";
 import { Menu, X, Users, Zap, Search } from "lucide-react";
 import Link from "next/link";
@@ -13,10 +13,20 @@ import { DefaultProfile } from "./ui";
 
 const Navbar = () => {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+
+  // 세션 업데이트 시 디버깅 로그
+  React.useEffect(() => {
+    if (session?.user?.profileImage) {
+      console.log(
+        "Navbar에서 감지된 프로필 이미지:",
+        session.user.profileImage
+      );
+    }
+  }, [session?.user?.profileImage]);
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -126,15 +136,21 @@ const Navbar = () => {
                 <DropDownMenu
                   onLogout={handleLogoutClick}
                   profileImage={
-                    session.user?.image ||
-                    (session as any)?.data?.profileImage ? (
+                    session.user?.profileImage || session.user?.image ? (
                       <img
+                        key={session.user.profileImage || session.user.image} // 강제 리렌더링을 위한 key 추가
                         src={
-                          (session as any)?.data?.profileImage ||
-                          session.user.image
+                          session.user.profileImage || session.user.image || ""
                         }
-                        className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md`}
+                        className="w-10 h-10 rounded-full flex items-center justify-center mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md object-cover"
                         alt="Profile"
+                        onLoad={() =>
+                          console.log(
+                            "프로필 이미지 로드됨:",
+                            session.user?.profileImage || session.user?.image
+                          )
+                        }
+                        onError={() => console.log("프로필 이미지 로드 실패")}
                       />
                     ) : (
                       <div className="cursor-pointer hover:scale-105 transition-transform">

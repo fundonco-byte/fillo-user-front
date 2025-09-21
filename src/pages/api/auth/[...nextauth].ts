@@ -4,13 +4,7 @@ import NextAuth from "next-auth";
 import Kakao from "next-auth/providers/kakao";
 import Credentials from "next-auth/providers/credentials";
 import { loginApi } from "@/lib/api";
-
-interface LoginResponse {
-  email: string,
-  name: string,
-  accessToken: string,
-  refreshToken: string
-}
+import { LoginResponseData } from "@/types/auth";
 
 export default NextAuth({
   providers: [
@@ -37,13 +31,14 @@ export default NextAuth({
           });
 
           if (response.statusCode === "FO-200") {
-            const loginResponseData = response.data as LoginResponse;
-            
+            const loginResponseData = response.data as LoginResponseData;
+
             // 성공 시 사용자 정보와 토큰을 반환
             return {
               id: loginResponseData.email || credentials.email,
               email: credentials.email,
               name: loginResponseData.name || "",
+              profileImage: loginResponseData.profileImage,
               accessToken: tokens.authorization,
               refreshToken: tokens.refreshToken,
             };
@@ -59,7 +54,14 @@ export default NextAuth({
   ],
   // 필요시 callbacks로 프로필 매핑/세션 확장
   callbacks: {
-    async jwt({ token, account, user }) {
+    async jwt({ token, account, user, trigger, session }) {
+      // 세션 업데이트 트리거 처리
+      if (trigger === "update" && session) {
+        if (session.profileImage) {
+          token.profileImage = session.profileImage;
+        }
+      }
+
       if (account) {
         token.provider = account.provider;
 
@@ -67,6 +69,7 @@ export default NextAuth({
         if (account.provider === "credentials" && user) {
           token.accessToken = user.accessToken;
           token.refreshToken = user.refreshToken;
+          token.profileImage = user.profileImage;
         }
       }
       return token;
@@ -77,6 +80,7 @@ export default NextAuth({
         ...session.user,
         accessToken: token.accessToken as string,
         refreshToken: token.refreshToken as string,
+        profileImage: token.profileImage as string,
       };
       return session;
     },

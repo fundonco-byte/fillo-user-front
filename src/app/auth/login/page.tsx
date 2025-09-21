@@ -41,6 +41,7 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
+      // NextAuth signIn을 사용하여 로그인 처리
       const result = await signIn("credentials", {
         email,
         password,
@@ -74,13 +75,12 @@ const LoginPage = () => {
     emailInputRef.current?.focus();
   };
 
-  // 카카오 로그인이 완료되면 메인 페이지로 이동
-  // 일반 이메일 로그인일 경우 별도로 확인 후 라우팅 처리 로직 필요
-  // useEffect(() => {
-  //   if (status === "authenticated") {
-  //     router.push("/");
-  //   }
-  // }, [status, router]);
+  // 로그인이 완료되면 사전 등록 페이지로 이동
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/pre-register");
+    }
+  }, [status, router]);
 
   return (
     <div className="min-h-screen gradient-bg-light flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

@@ -234,7 +234,7 @@ interface DaumPostCode {
 }
 
 const MyPage = () => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -264,9 +264,53 @@ const MyPage = () => {
   const { execute } = useApi();
   const isInitialLoad = useRef(false);
 
+  // 사용자 정보 불러오기 함수
+  const fetchUserInfo = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await execute("/api/v1/member/info", {
+        headers: await createHeaders(true),
+        method: "GET",
+      });
+
+      const res = response;
+
+      if (typeof res !== "string" && res.statusCode === "FO-200") {
+        const userInfo = res.data as UserInfo;
+        if (userInfo) {
+          setUserInfo(userInfo);
+          setEditForm({
+            nickName: userInfo.nickName || "",
+            leagueId: userInfo.leagueId || 0,
+            leagueName: userInfo.leagueName || "",
+            teamId: userInfo.teamId || 0,
+            teamName: userInfo.teamName || "",
+            personalInfoAgreement: userInfo.personalInfoAgreement || "",
+            marketingAgreement: userInfo.marketingAgreement || "",
+            phone: userInfo.phone || "",
+            birthDate: formatDateForInput(userInfo.birthDate),
+            address: userInfo.address || "",
+          });
+        }
+      } else {
+        if (res === "Token-Expired") {
+          console.error("사용자 정보 불러오기 실패:", res);
+          router.push("/auth/login");
+        } else {
+          console.error("사용자 정보 불러오기 실패:", res.statusMessage);
+        }
+      }
+    } catch (error) {
+      console.error("API 호출 오류:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // 사용자 정보 불러오기
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const initializeUserInfo = async () => {
       if (isInitialLoad.current) {
         return;
       }
@@ -282,54 +326,11 @@ const MyPage = () => {
         return;
       }
 
-      try {
-        // Authorization과 RefreshToken 헤더 설정
-        // const authToken = localStorage.getItem("authToken") || "";
-        // const refreshToken = localStorage.getItem("refreshToken") || "";
-
-        const response = await execute("/api/v1/member/info", {
-          headers: await createHeaders(true),
-          method: "GET",
-        });
-
-        const res = response;
-
-        if (typeof res !== "string" && res.statusCode === "FO-200") {
-          const userInfo = res.data as UserInfo;
-          if (userInfo) {
-            setUserInfo(userInfo);
-            setEditForm({
-              nickName: userInfo.nickName || "",
-              leagueId: userInfo.leagueId || 0,
-              leagueName: userInfo.leagueName || "",
-              teamId: userInfo.teamId || 0,
-              teamName: userInfo.teamName || "",
-              personalInfoAgreement: userInfo.personalInfoAgreement || "",
-              marketingAgreement: userInfo.marketingAgreement || "",
-              phone: userInfo.phone || "",
-              birthDate: formatDateForInput(userInfo.birthDate),
-              address: userInfo.address || "",
-            });
-          }
-        } else {
-          if (res === "Token-Expired") {
-            console.error("사용자 정보 불러오기 실패:", res);
-          } else {
-            console.error("사용자 정보 불러오기 실패:", res.statusMessage);
-          }
-
-          // 토큰이 만료된 경우 로그인 페이지로 리다이렉트
-          router.push("/auth/login");
-        }
-      } catch (error) {
-        console.error("API 호출 오류:", error);
-      } finally {
-        setIsLoading(false);
-        isInitialLoad.current = true;
-      }
+      await fetchUserInfo();
+      isInitialLoad.current = true;
     };
 
-    fetchUserInfo();
+    initializeUserInfo();
   }, [session, status, router, execute]);
 
   // 리그 목록 가져오기
@@ -496,10 +497,36 @@ const MyPage = () => {
       if (typeof response !== "string" && response.statusCode === "FO-200") {
         const res = response;
         if (res.statusCode === "FO-200") {
-          // 성공 시 마이페이지로 리다이렉트
+          // API 응답에서 업데이트된 사용자 정보 가져오기
+          const updatedProfileImage = res.data as string;
+
+          // 성공 시 편집 모드 종료 및 상태 초기화
           setIsEditing(false);
-          router.push("/my-page");
-          window.location.reload();
+          setProfileImage(null);
+          setProfileImagePreview("");
+
+          // 세션 업데이트 (프로필 이미지가 변경된 경우)
+          if (updatedProfileImage && session?.user) {
+            try {
+              // NextAuth 세션 업데이트 - 새로운 프로필 이미지 경로 적용
+              console.log("세션 업데이트 시작:", updatedProfileImage);
+              await update({
+                profileImage: updatedProfileImage,
+              });
+              console.log("세션 업데이트 완료");
+
+              // 세션 업데이트가 반영될 때까지 약간의 지연
+              await new Promise((resolve) => setTimeout(resolve, 200));
+            } catch (updateError) {
+              console.error("세션 업데이트 오류:", updateError);
+            }
+          }
+
+          // 사용자 정보 다시 불러오기 (최신 정보 반영)
+          await fetchUserInfo();
+
+          // 성공 메시지 표시
+          console.log("프로필 정보가 성공적으로 업데이트되었습니다.");
         } else {
           setErrorMessage("정보 수정에 실패했습니다.");
           setShowErrorDialog(true);
