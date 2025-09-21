@@ -126,9 +126,13 @@ const Navbar = () => {
                 <DropDownMenu
                   onLogout={handleLogoutClick}
                   profileImage={
-                    session.user?.image ? (
+                    session.user?.image ||
+                    (session as any)?.data?.profileImage ? (
                       <img
-                        src={session.user.image}
+                        src={
+                          (session as any)?.data?.profileImage ||
+                          session.user.image
+                        }
                         className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md`}
                         alt="Profile"
                       />

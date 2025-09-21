@@ -434,7 +434,7 @@ const PreRegisterPage = () => {
            group-active:opacity-100 group-active:scale-100"
                   >
                     <div className="flex items-center justify-center bg-gray-300 text-white text-sm px-3 py-2 rounded shadow-lg">
-                      <p className="text-sm text-gray-500 flex flex-col">
+                      <p className="text-sm text-gray-500 whitespace-nowrap">
                         노션 페이지 준비 중입니다 :)
                       </p>
                     </div>
