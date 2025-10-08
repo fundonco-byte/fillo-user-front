@@ -1,45 +1,74 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Eye, EyeOff, ChevronDown } from "lucide-react";
+import { Eye, EyeOff, ChevronDown, Upload, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useApi } from "@/hooks/useApi";
 import { createHeaders } from "@/lib/api";
 import { League, Team } from "@/types/league";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { DefaultProfile } from "@/components/ui";
 
 interface FormData {
   email: string;
-  emailVerificationCode: string;
-  password: string;
-  checkPassword: string;
   name: string;
+  passwordChangeCheck: string;
+  password: string;
+  newPassword: string;
+  newPasswordConfirm: string;
   gender: string;
   birthDate: string;
   birthYear: number;
   birthMonth: number;
   birthDay: number;
   leagueId: number;
+  leagueName: string;
   teamId: number;
+  teamName: string;
   leagueId2: number;
+  league2Name: string;
   teamId2: number;
+  team2Name: string;
   personalInfoAgreement: string;
   marketingAgreement: string;
 }
 
 interface FormErrors {
   email?: string;
-  emailVerificationCode?: string;
+  name?: string;
   password?: string;
   passwordConfirm?: string;
-  name?: string;
   gender?: string;
   birth?: string;
-  address?: string;
-  idNumber?: string;
   selectedLeague?: string;
   selectedTeam?: string;
   agreeTerms?: string;
+}
+
+interface UserInfo {
+  id: string;
+  email: string;
+  name: string;
+  nickName: string;
+  phone?: string;
+  profileImage?: string;
+  gender?: string;
+  birthDate?: string;
+  address?: string;
+  joinDate: string;
+  preferredSports: string[];
+  leagueId: number;
+  leagueName: string;
+  teamId: number;
+  teamName: string;
+  leagueId2: number;
+  teamId2: number;
+  league2Name: string;
+  team2Name: string;
+  personalInfoAgreement: string;
+  marketingAgreement: string;
 }
 
 // 리그별 팀 데이터
@@ -104,10 +133,6 @@ const leagueTeams = (league: League) => [
         teamId: 2,
         teamName: "도르트문트",
       },
-      {
-        teamId: 3,
-        teamName: "레버쿠젠",
-      },
     ],
   },
   {
@@ -116,169 +141,246 @@ const leagueTeams = (league: League) => [
     relatedTeams: [
       {
         teamId: 1,
-        teamName: "인터밀란",
-      },
-      {
-        teamId: 2,
-        teamName: "AC밀란",
-      },
-      {
-        teamId: 3,
         teamName: "유벤투스",
       },
       {
-        teamId: 4,
-        teamName: "아탈란타",
-      },
-      {
-        teamId: 5,
-        teamName: "AS로마",
+        teamId: 2,
+        teamName: "AC 밀란",
       },
     ],
   },
   {
     leagueId: 5,
-    leagueName: "리그앙",
+    leagueName: "K리그",
     relatedTeams: [
       {
         teamId: 1,
-        teamName: "PSG",
+        teamName: "FC 서울",
       },
       {
         teamId: 2,
-        teamName: "리옹",
-      },
-      {
-        teamId: 3,
-        teamName: "마르세유",
+        teamName: "수원 삼성",
       },
     ],
   },
   {
-    leagueId: 0,
-    leagueName: "없음",
+    leagueId: 6,
+    leagueName: "기타",
     relatedTeams: [
       {
-        teamId: 0,
-        teamName: "없음",
+        teamId: 1,
+        teamName: "기타 팀 1",
+      },
+      {
+        teamId: 2,
+        teamName: "기타 팀 2",
+      },
+    ],
+  },
+  {
+    leagueId: 7,
+    leagueName: "KBO",
+    relatedTeams: [
+      {
+        teamId: 1,
+        teamName: "LG 트윈스",
+      },
+      {
+        teamId: 2,
+        teamName: "두산 베어스",
+      },
+    ],
+  },
+  {
+    leagueId: 8,
+    leagueName: "국가대표",
+    relatedTeams: [
+      {
+        teamId: 1,
+        teamName: "한국 국가대표",
       },
     ],
   },
 ];
 
-const SignupPage = () => {
+export default function ProfileEditPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const { execute: apiRequest } = useApi();
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  // 폼 데이터 상태
   const [formData, setFormData] = useState<FormData>({
     email: "",
-    emailVerificationCode: "",
-    password: "",
-    checkPassword: "",
     name: "",
+    passwordChangeCheck: "N",
+    password: "",
+    newPassword: "",
+    newPasswordConfirm: "",
     gender: "",
     birthDate: "",
-    birthYear: 0,
-    birthMonth: 0,
-    birthDay: 0,
-    leagueId: -1,
-    teamId: -1,
+    birthYear: new Date().getFullYear(),
+    birthMonth: 1,
+    birthDay: 1,
+    leagueId: 0,
+    leagueName: "",
+    teamId: 0,
+    teamName: "",
     leagueId2: 0,
+    league2Name: "없음",
     teamId2: 0,
-    personalInfoAgreement: "",
-    marketingAgreement: "",
+    team2Name: "",
+    personalInfoAgreement: "n",
+    marketingAgreement: "n",
   });
 
-  // 선택된 리그/팀 관리를 위한 상태
+  // 에러 상태
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // UI 상태
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // 리그/팀 선택 상태
   const [selectedLeagues, setSelectedLeagues] = useState<number[]>([]);
   const [selectedTeams, setSelectedTeams] = useState<
     { leagueId: number; teamId: number }[]
   >([]);
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [showTerms, setShowTerms] = useState(false);
-  const { data, execute, loading, error } = useApi();
-  const isInitialLoad = useRef(false); // API 호출이 한 번만 실행되도록 ref 사용
   const [leagues, setLeagues] = useState<League[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
 
-  // 이메일 인증 관련 상태
-  const [authCode, setAuthCode] = useState<string>("");
-  const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
-  const [showTimeoutDialog, setShowTimeoutDialog] = useState<boolean>(false);
-  const [showSuccessDialog, setShowSuccessDialog] = useState<boolean>(false);
-  const [showErrorDialog, setShowErrorDialog] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // 프로필 이미지 상태
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string>("");
 
-  useEffect(() => {
-    // 페이지 진입 시 호출되는 api 중복 호출 방지 처리
-    if (isInitialLoad.current) {
-      return;
-    }
+  // 사용자 정보 상태
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-    // 회원 가입 시 필요한 리그 목록 api 호출
-    const callAllLeagues = async () => {
-      try {
-        const response = await execute("/api/v1/league/all", {
-          method: "GET",
-          headers: await createHeaders(false),
+  // 사용자 정보 가져오기
+  const fetchUserInfo = async () => {
+    if (!session?.user?.email) return;
+
+    try {
+      const response = await apiRequest("/api/v1/member/info", {
+        method: "GET",
+      });
+
+      if (response && typeof response !== "string" && response.data) {
+        const data = response.data as UserInfo;
+        setUserInfo(data);
+
+        // 생년월일 파싱 (YYYY-MM-DD 또는 YYYYMMDD 형식)
+        let birthYear = new Date().getFullYear();
+        let birthMonth = 1;
+        let birthDay = 1;
+
+        if (data.birthDate) {
+          let dateStr = data.birthDate.replace(/-/g, ""); // YYYY-MM-DD -> YYYYMMDD
+          if (dateStr.length === 8) {
+            birthYear = parseInt(dateStr.substring(0, 4));
+            birthMonth = parseInt(dateStr.substring(4, 6));
+            birthDay = parseInt(dateStr.substring(6, 8));
+          }
+        }
+
+        // 폼 데이터에 사용자 정보 설정
+        setFormData({
+          email: data.email || "",
+          name: data.name || "",
+          passwordChangeCheck: "N",
+          password: "",
+          newPassword: "",
+          newPasswordConfirm: "",
+          gender: data.gender || "",
+          birthDate: data.birthDate || "",
+          birthYear,
+          birthMonth,
+          birthDay,
+          leagueId: data.leagueId || 0,
+          leagueName: data.leagueName || "",
+          teamId: data.teamId || 0,
+          teamName: data.teamName || "",
+          leagueId2: data.leagueId2 || 0,
+          league2Name: data.league2Name || "없음",
+          teamId2: data.teamId2 || 0,
+          team2Name: data.team2Name || "",
+          personalInfoAgreement: data.personalInfoAgreement || "n",
+          marketingAgreement: data.marketingAgreement || "n",
         });
 
-        const res = response;
-
-        // 리그 목록 API 응답 처리
-        if (typeof res !== "string" && res.statusCode === "FO-200") {
-          const leagueData = res.data;
-
-          // 응답 데이터 검증
-          if (!leagueData || !Array.isArray(leagueData)) {
-            console.warn("유효하지 않은 리그 API 응답:", leagueData);
-            return;
-          }
-
-          // 데이터가 비어있는 경우 처리
-          if (leagueData.length === 0) {
-            console.log("반환된 리그 데이터가 없습니다.");
-            return;
-          }
-
-          const getLeagueList = leagueData
-            .map((league: League) => {
-              // 각 멤버 데이터의 필수 필드 검증
-              if (!league || typeof league.leagueId === "undefined") {
-                console.warn("유효하지 않은 리그 데이터:", league);
-                return null;
-              }
-
-              return league;
-            })
-            .filter(
-              (league: League | null): league is League => league !== null
-            ); // null 값 제거
-
-          if (getLeagueList.length > 0) {
-            setLeagues([...leagues, ...getLeagueList]); // 기존 샘플 데이터를 대체
-            console.log(
-              `${getLeagueList.length}개의 리그 데이터를 로드했습니다.`
-            );
-          }
-        } else {
-          console.warn("리그 목록 API 응답 예외 오류 발생");
+        // 기존 프로필 이미지 설정
+        if (data.profileImage) {
+          setProfileImagePreview(data.profileImage);
         }
-      } catch (error) {}
-    };
 
-    // 회원 가입 시 리그 목록 호출 함수 실행행
-    callAllLeagues();
+        // 기존 리그/팀 선택 설정
+        if (data.leagueId && data.teamId) {
+          setSelectedLeagues([data.leagueId]);
+          setSelectedTeams([{ leagueId: data.leagueId, teamId: data.teamId }]);
+        }
+        if (data.leagueId2 && data.teamId2) {
+          setSelectedLeagues((prev) => [...prev, data.leagueId2]);
+          setSelectedTeams((prev) => [
+            ...prev,
+            { leagueId: data.leagueId2, teamId: data.teamId2 },
+          ]);
+        }
+      }
+    } catch (error) {
+      console.error("사용자 정보 가져오기 오류:", error);
+    }
+  };
 
-    isInitialLoad.current = true;
-  }, [leagues, isInitialLoad]);
+  // 리그 데이터 가져오기
+  const fetchLeagues = async () => {
+    try {
+      const response = await apiRequest("/api/v1/league/all", {
+        method: "GET",
+      });
 
+      if (response && typeof response !== "string" && response.data) {
+        const data = response.data as League[];
+        setLeagues(data);
+      }
+    } catch (error) {
+      console.error("리그 데이터 가져오기 오류:", error);
+    }
+  };
+
+  // 프로필 이미지 변경 핸들러
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 입력 변경 핸들러
+  const handleInputChange = (field: keyof FormData, value: string | number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // 에러 메시지 제거
+    if (errors[field as keyof FormErrors]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
+  };
+
+  // 리그 선택 핸들러
   const handleLeagueSelection = (leagueId: number) => {
     if (leagueId === 0) {
-      // "없음" 선택 시 모든 선택 초기화
+      // "없음" 선택 시 모든 선택 해제
       setSelectedLeagues([]);
       setSelectedTeams([]);
       setFormData((prev) => ({
@@ -291,497 +393,392 @@ const SignupPage = () => {
       return;
     }
 
-    const isSelected = selectedLeagues.includes(leagueId);
-
-    if (isSelected) {
-      // 이미 선택된 리그 해제
-      const newSelectedLeagues = selectedLeagues.filter(
-        (id) => id !== leagueId
-      );
-      const newSelectedTeams = selectedTeams.filter(
-        (team) => team.leagueId !== leagueId
-      );
-
-      setSelectedLeagues(newSelectedLeagues);
-      setSelectedTeams(newSelectedTeams);
-
-      // formData 업데이트
-      updateFormDataFromSelections(newSelectedLeagues, newSelectedTeams);
-    } else {
-      // 새로운 리그 선택 시 제한 조건 확인
-      if (selectedLeagues.length >= 2) {
-        alert("최대 2개의 리그까지 선택할 수 있습니다.");
-        return;
-      }
-
-      // 동일한 리그에서 2개 팀이 이미 선택된 경우 다른 리그 선택 제한
-      const hasTwoTeamsFromSameLeague = selectedTeams.some((team) => {
-        const teamsFromSameLeague = selectedTeams.filter(
-          (t) => t.leagueId === team.leagueId
+    setSelectedLeagues((prev) => {
+      const isSelected = prev.includes(leagueId);
+      if (isSelected) {
+        // 이미 선택된 리그인 경우 선택 해제
+        const newSelectedLeagues = prev.filter((id) => id !== leagueId);
+        const newSelectedTeams = selectedTeams.filter(
+          (team) => team.leagueId !== leagueId
         );
-        return teamsFromSameLeague.length >= 2;
-      });
-
-      if (hasTwoTeamsFromSameLeague) {
-        alert(
-          "동일한 리그에서 2개의 팀을 선택한 경우, 다른 리그를 선택할 수 없습니다."
-        );
-        return;
+        setSelectedTeams(newSelectedTeams);
+        updateFormDataFromSelections(newSelectedLeagues, newSelectedTeams);
+        return newSelectedLeagues;
+      } else {
+        // 새로운 리그 선택
+        const newSelectedLeagues = [...prev, leagueId];
+        setSelectedTeams((prevTeams) => {
+          const newSelectedTeams = prevTeams.filter(
+            (team) => team.leagueId !== leagueId
+          );
+          updateFormDataFromSelections(newSelectedLeagues, newSelectedTeams);
+          return newSelectedTeams;
+        });
+        return newSelectedLeagues;
       }
-
-      const newSelectedLeagues = [...selectedLeagues, leagueId];
-      setSelectedLeagues(newSelectedLeagues);
-
-      // 해당 리그의 팀 목록 가져오기
-      getAvailableTeams(leagueId);
-    }
+    });
   };
 
+  // 팀 선택 핸들러
   const handleTeamSelection = (leagueId: number, teamId: number) => {
-    if (teamId === 0) {
-      // "없음" 팀 선택 시 해당 리그의 모든 팀 선택 해제
-      const newSelectedTeams = selectedTeams.filter(
-        (team) => team.leagueId !== leagueId
+    setSelectedTeams((prev) => {
+      const existingTeamIndex = prev.findIndex(
+        (team) => team.leagueId === leagueId && team.teamId === teamId
       );
-      setSelectedTeams(newSelectedTeams);
-      updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
-      return;
-    }
 
-    // 동일한 리그에서 동일한 팀이 이미 선택되어 있는지 확인
-    const existingTeamIndex = selectedTeams.findIndex(
-      (team) => team.leagueId === leagueId && team.teamId === teamId
-    );
-
-    if (existingTeamIndex >= 0) {
-      // 이미 선택된 팀이면 해제
-      const newSelectedTeams = selectedTeams.filter(
-        (_, index) => index !== existingTeamIndex
-      );
-      setSelectedTeams(newSelectedTeams);
-      updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
-    } else {
-      // 새로운 팀 선택
-      if (selectedTeams.length >= 2) {
-        alert("최대 2개의 팀까지 선택할 수 있습니다.");
-        return;
+      if (existingTeamIndex !== -1) {
+        // 이미 선택된 팀인 경우 선택 해제
+        const newSelectedTeams = prev.filter(
+          (_, index) => index !== existingTeamIndex
+        );
+        updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
+        return newSelectedTeams;
+      } else {
+        // 새로운 팀 선택 (최대 2개)
+        if (prev.length >= 2) {
+          return prev;
+        }
+        const newSelectedTeams = [...prev, { leagueId, teamId }];
+        updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
+        return newSelectedTeams;
       }
-
-      const newSelectedTeams = [...selectedTeams, { leagueId, teamId }];
-      setSelectedTeams(newSelectedTeams);
-      updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
-    }
+    });
   };
 
+  // 선택된 리그/팀으로 폼 데이터 업데이트
   const updateFormDataFromSelections = (
-    leagues: number[],
+    selectedLeagueIds: number[],
     teams: { leagueId: number; teamId: number }[]
   ) => {
-    if (teams.length === 0) {
-      // 선택된 팀이 없으면 "없음" 상태
-      setFormData((prev) => ({
-        ...prev,
-        leagueId: 0,
-        teamId: 0,
-        leagueId2: 0,
-        teamId2: 0,
-      }));
-    } else if (teams.length === 1) {
-      // 1개 팀 선택
-      setFormData((prev) => ({
-        ...prev,
-        leagueId: teams[0].leagueId,
-        teamId: teams[0].teamId,
-        leagueId2: 0,
-        teamId2: 0,
-      }));
-    } else if (teams.length === 2) {
-      // 2개 팀 선택 - 동일한 리그에서도 선택 가능
-      setFormData((prev) => ({
-        ...prev,
-        leagueId: teams[0].leagueId,
-        teamId: teams[0].teamId,
-        leagueId2: teams[1].leagueId, // 동일한 리그 ID가 들어갈 수 있음
-        teamId2: teams[1].teamId,
-      }));
-    }
-  };
+    const firstTeam = teams[0];
+    const secondTeam = teams[1];
 
-  const handleInputChange = (
-    field: keyof FormData,
-    value: string | boolean | number
-  ) => {
+    // 리그 이름 찾기
+    const getLeagueName = (leagueId: number) => {
+      const leagueNames = [
+        { id: 1, name: "프리미어리그" },
+        { id: 2, name: "스페인 라리가" },
+        { id: 3, name: "분데스리가" },
+        { id: 4, name: "세리에A" },
+        { id: 5, name: "K리그" },
+        { id: 6, name: "기타" },
+        { id: 7, name: "KBO" },
+        { id: 8, name: "국가대표(한국)" },
+      ];
+      return leagueNames.find((l) => l.id === leagueId)?.name || "";
+    };
+
+    // 팀 이름 찾기
+    const getTeamName = (leagueId: number, teamId: number) => {
+      const currentLeague = leagues.find((l) => l.leagueId === leagueId);
+      if (!currentLeague) return "";
+
+      const leagueTeamData = leagueTeams(currentLeague)[leagueId - 1];
+      return (
+        leagueTeamData?.relatedTeams.find((t) => t.teamId === teamId)
+          ?.teamName || ""
+      );
+    };
+
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      leagueId: firstTeam?.leagueId || 0,
+      leagueName: firstTeam ? getLeagueName(firstTeam.leagueId) : "",
+      teamId: firstTeam?.teamId || 0,
+      teamName: firstTeam
+        ? getTeamName(firstTeam.leagueId, firstTeam.teamId)
+        : "",
+      leagueId2: secondTeam?.leagueId || 0,
+      league2Name: secondTeam ? getLeagueName(secondTeam.leagueId) : "없음",
+      teamId2: secondTeam?.teamId || 0,
+      team2Name: secondTeam
+        ? getTeamName(secondTeam.leagueId, secondTeam.teamId)
+        : "",
     }));
-
-    // 에러 클리어
-    if (errors[field as keyof FormErrors]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: undefined,
-      }));
-    }
   };
 
-  const getAvailableTeams = async (leagueId: number) => {
-    if (leagueId === 0) {
-      // leagueId가 0 (없음)인 경우 "없음" 팀만 설정
-      setTeams([{ teamId: 0, teamName: "없음", leagueId: 0 }]);
-      // "없음" 팀 자동 선택
-      setFormData((prev) => ({
-        ...prev,
-        teamId: 0,
-      }));
-      // return [];
-    } else {
-      try {
-        const response = await execute(
-          "/api/v1/team/all?leagueId=" + leagueId,
-          {
-            headers: await createHeaders(false),
-            method: "GET",
-          }
-        );
-
-        const res = response;
-
-        if (typeof res !== "string" && res.statusCode === "FO-200") {
-          const teamData = res.data;
-
-          if (!teamData || !Array.isArray(teamData)) {
-            console.warn("유효하지 않은 팀 API 응답:", teamData);
-            setTeams([]);
-            return [];
-          }
-
-          const getTeamList = teamData
-            .map((team: Team) => {
-              if (!team || typeof team.teamId === "undefined") {
-                console.warn("유효하지 않은 팀 데이터:", team);
-                return null;
-              }
-
-              console.log("로드된 팀 데이터:", team);
-              return team;
-            })
-            .filter((team: Team | null): team is Team => team !== null);
-
-          if (getTeamList.length > 0) {
-            setTeams(getTeamList);
-            console.log(`${getTeamList.length}개의 팀 데이터를 로드했습니다.`);
-            console.log("로드된 팀 데이터:", getTeamList);
-          } else {
-            setTeams([]);
-            console.log("해당 리그에 팀 데이터가 없습니다.");
-          }
-        } else {
-          console.warn("팀 목록 API 응답 예외 오류 발생");
-          setTeams([]);
-        }
-      } catch (error) {
-        console.error("팀 목록 API 호출 중 오류 발생:", error);
-        setTeams([]);
-      }
-    }
-  };
-
-  // 타이머 관리 useEffect
-  useEffect(() => {
-    if (isTimerActive && timeLeft > 0) {
-      timerRef.current = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
-    } else if (timeLeft === 0 && isTimerActive) {
-      // 타이머 종료
-      setIsTimerActive(false);
-      setAuthCode("");
-      setShowTimeoutDialog(true);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, [timeLeft, isTimerActive]);
-
-  // 컴포넌트 언마운트 시 타이머 정리
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
-
-  const handleEmailVerification = async () => {
-    if (!formData.email) {
-      alert("이메일을 입력해주세요.");
-      return;
-    }
-
-    try {
-      // const API_URL = "http://1.234.75.29:8093/api/v1/member/email/authorize";
-      const API_URL = "http://localhost:8093/api/v1/member/email/authorize";
-
-      const response = await execute(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-        }),
-      });
-
-      console.log("이메일 인증 API 응답:", response);
-
-      if (typeof response !== "string" && response.statusCode === "FO-200") {
-        const authCode = response.data as string;
-        // 인증 성공
-        setAuthCode(authCode);
-        setTimeLeft(180); // 3분 = 180초
-        setIsTimerActive(true);
-        alert("인증번호가 이메일로 전송되었습니다.");
-      } else {
-        alert("이메일 인증 요청에 실패했습니다. 다시 시도해주세요.");
-      }
-    } catch (error) {
-      console.error("이메일 인증 API 오류:", error);
-      alert("이메일 인증 요청 중 오류가 발생했습니다.");
-    }
-  };
-
-  const handleVerificationCodeCheck = () => {
-    if (!formData.emailVerificationCode) {
-      alert("인증번호를 입력해주세요.");
-      return;
-    }
-
-    if (formData.emailVerificationCode === authCode) {
-      setIsEmailVerified(true);
-      setIsTimerActive(false);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-      alert("이메일 인증이 완료되었습니다.");
-    } else {
-      alert("인증번호가 올바르지 않습니다.");
-    }
-  };
-
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
+  // 폼 검증
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // 디버깅을 위한 로그
-    console.log(
-      "유효성 검사 - leagueId:",
-      formData.leagueId,
-      typeof formData.leagueId
-    );
-    console.log(
-      "유효성 검사 - teamId:",
-      formData.teamId,
-      typeof formData.teamId
-    );
-
-    // 이메일 검증
-    if (!formData.email) {
-      newErrors.email = "이메일을 입력해주세요.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "올바른 이메일 형식이 아닙니다.";
-    }
-
-    // 인증번호 검증
-    if (!formData.emailVerificationCode) {
-      newErrors.emailVerificationCode = "인증번호를 입력해주세요.";
-    }
-
-    // 비밀번호 검증
-    if (!formData.password) {
-      newErrors.password = "비밀번호를 입력해주세요.";
-    } else if (
-      !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/.test(
-        formData.password
-      )
-    ) {
-      newErrors.password = "영문, 숫자, 특수문자 포함 8~20자까지 입력하세요.";
-    }
-
-    // 비밀번호 확인 검증
-    if (!formData.checkPassword) {
-      newErrors.passwordConfirm = "비밀번호를 다시 입력해주세요.";
-    } else if (formData.password !== formData.checkPassword) {
-      newErrors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
-    }
-
-    // 이름 검증
-    if (!formData.name) {
+    if (!formData.name.trim()) {
       newErrors.name = "이름을 입력해주세요.";
     }
 
-    // 성별 검증
-    if (!formData.gender) {
-      newErrors.gender = "성별을 선택해주세요.";
+    // 비밀번호 변경이 체크된 경우에만 비밀번호 검증
+    if (formData.passwordChangeCheck === "Y") {
+      if (!formData.password.trim()) {
+        newErrors.password = "현재 비밀번호를 입력해주세요.";
+      }
+
+      if (!formData.newPassword.trim()) {
+        newErrors.passwordConfirm = "새 비밀번호를 입력해주세요.";
+      } else if (formData.newPassword.length < 8) {
+        newErrors.passwordConfirm = "비밀번호는 8자 이상이어야 합니다.";
+      } else if (formData.newPassword !== formData.newPasswordConfirm) {
+        newErrors.passwordConfirm = "새 비밀번호가 일치하지 않습니다.";
+      }
     }
 
-    // 생년월일 검증
-    if (!formData.birthYear || !formData.birthMonth || !formData.birthDay) {
-      newErrors.birth = "생년월일을 모두 선택해주세요.";
+    if (
+      !formData.birthDate ||
+      formData.birthYear === 0 ||
+      formData.birthMonth === 0 ||
+      formData.birthDay === 0
+    ) {
+      newErrors.birth = "생년월일을 선택해주세요.";
     }
 
-    // 주소 검증
-    // if (!formData.address) {
-    //   newErrors.address = "주소를 입력해주세요.";
-    // }
-
-    // 주민번호 검증
-    // if (!formData.idNumber) {
-    //   newErrors.idNumber = "주민번호를 입력해주세요.";
-    // }
-
-    // 응원 리그 검증 (0은 "없음", -1은 미선택)
-    if (formData.leagueId === -1) {
-      newErrors.selectedLeague = "응원 리그를 선택해주세요.";
+    if (selectedLeagues.length === 0) {
+      newErrors.selectedLeague = "최소 1개의 리그를 선택해주세요.";
     }
 
-    // 응원팀 검증 (0은 "없음", -1은 미선택)
-    if (formData.teamId === -1) {
-      newErrors.selectedTeam = "응원팀을 선택해주세요.";
-    }
-
-    // 필수 동의 항목 검증
-    if (!formData.personalInfoAgreement) {
-      newErrors.agreeTerms = "개인정보 수집 및 이용 동의는 필수입니다.";
+    if (selectedTeams.length === 0) {
+      newErrors.selectedTeam = "최소 1개의 팀을 선택해주세요.";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // 폼 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      alert(
-        "마케팅 및 카카오톡 알림 메시지 수신 동의를 제외한 나머지 정보를 모두 입력해주세요."
-      );
       return;
     }
-
-    // 이메일 인증번호 확인
-    if (!authCode) {
-      alert("이메일 인증을 먼저 진행해주세요.");
-      return;
-    }
-
-    if (formData.emailVerificationCode !== authCode) {
-      alert("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
-      return;
-    }
-
-    // 생년월일 합치기 (YYYYMMDD 형식)
-    const birthDate = `${formData.birthYear}${formData.birthMonth
-      .toString()
-      .padStart(2, "0")}${formData.birthDay.toString().padStart(2, "0")}`;
-
-    // 디버깅을 위한 로그
-    console.log("생년월일 디버깅:");
-    console.log("birthYear:", formData.birthYear, typeof formData.birthYear);
-    console.log("birthMonth:", formData.birthMonth, typeof formData.birthMonth);
-    console.log("birthDay:", formData.birthDay, typeof formData.birthDay);
-    console.log("생성된 birthDate:", birthDate, "길이:", birthDate.length);
-
-    // 생년월일 형식 재검증
-    if (
-      birthDate.length !== 8 ||
-      birthDate.includes("NaN") ||
-      birthDate.includes("undefined")
-    ) {
-      alert("생년월일을 올바르게 선택해주세요.");
-      return;
-    }
-
-    // 성별 변환 (male -> M, female -> F)
-    const gender =
-      formData.gender === "male"
-        ? "M"
-        : formData.gender === "female"
-        ? "F"
-        : "";
-
-    // 선택된 팀 정보를 첫 번째와 두 번째로 분리
-    const firstTeam = selectedTeams[0] || { leagueId: 0, teamId: 0 };
-    const secondTeam = selectedTeams[1] || { leagueId: 0, teamId: 0 };
-
-    const requestData = {
-      email: formData.email,
-      emailVerificationCode: authCode,
-      password: formData.password,
-      checkPassword: formData.checkPassword,
-      name: formData.name,
-      gender: gender,
-      birthDate: birthDate,
-      leagueId: firstTeam.leagueId,
-      teamId: firstTeam.teamId,
-      leagueId2: secondTeam.leagueId,
-      teamId2: secondTeam.teamId,
-      personalInfoAgreement: formData.personalInfoAgreement === "y" ? "y" : "n",
-      marketingAgreement: formData.marketingAgreement === "y" ? "y" : "n",
-    };
-
-    console.log("전송할 회원가입 데이터:", requestData);
-    console.log(
-      "리그/팀 선택 확인 - leagueId:",
-      formData.leagueId,
-      "teamId:",
-      formData.teamId,
-      "leagueId2:",
-      formData.leagueId2,
-      "teamId2:",
-      formData.teamId2
-    );
-    console.log("선택된 팀들:", selectedTeams);
 
     try {
-      const response = await execute("/api/v1/member/regist", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
+      // 기본 정보 검증
+      if (!formData.name?.trim()) {
+        throw new Error("이름이 입력되지 않았습니다.");
+      }
+
+      // 비밀번호 변경이 체크된 경우 비밀번호 검증
+      if (formData.passwordChangeCheck === "Y") {
+        if (!formData.password?.trim() || !formData.newPassword?.trim()) {
+          throw new Error(
+            "비밀번호 변경 시 현재 비밀번호와 새 비밀번호를 모두 입력해야 합니다."
+          );
+        }
+        if (formData.newPassword !== formData.newPasswordConfirm) {
+          throw new Error("새 비밀번호가 일치하지 않습니다.");
+        }
+      }
+
+      // 생년월일 검증
+      if (!formData.birthDate || formData.birthDate.length !== 8) {
+        throw new Error("올바른 생년월일을 선택해주세요.");
+      }
+
+      // 리그/팀 정보 검증
+      if (formData.leagueId === 0 || formData.teamId === 0) {
+        throw new Error("최소 1개의 리그와 팀을 선택해야 합니다.");
+      }
+
+      // 요청 데이터 구성 (서버 형식에 맞게)
+      const requestData: any = {
+        name: formData.name.trim(),
+        passwordChangeCheck: formData.passwordChangeCheck,
+        birthDate: formData.birthDate,
+        leagueId: formData.leagueId,
+        leagueName: formData.leagueName || "",
+        teamId: formData.teamId,
+        teamName: formData.teamName || "",
+        leagueId2: formData.leagueId2,
+        league2Name: formData.league2Name || "없음",
+        teamId2: formData.teamId2,
+        team2Name: formData.team2Name || "",
+        marketingAgreement: formData.marketingAgreement,
+      };
+
+      // 데이터 검증 로그
+      console.log("=== 데이터 검증 (서버 형식) ===");
+      console.log(
+        "name:",
+        requestData.name,
+        "(length:",
+        requestData.name.length,
+        ")"
+      );
+      console.log("passwordChangeCheck:", requestData.passwordChangeCheck);
+      console.log(
+        "birthDate:",
+        requestData.birthDate,
+        "(length:",
+        requestData.birthDate.length,
+        ")"
+      );
+      console.log(
+        "leagueId:",
+        requestData.leagueId,
+        "(type:",
+        typeof requestData.leagueId,
+        ")"
+      );
+      console.log("leagueName:", requestData.leagueName);
+      console.log(
+        "teamId:",
+        requestData.teamId,
+        "(type:",
+        typeof requestData.teamId,
+        ")"
+      );
+      console.log("teamName:", requestData.teamName);
+      console.log(
+        "leagueId2:",
+        requestData.leagueId2,
+        "(type:",
+        typeof requestData.leagueId2,
+        ")"
+      );
+      console.log("league2Name:", requestData.league2Name);
+      console.log(
+        "teamId2:",
+        requestData.teamId2,
+        "(type:",
+        typeof requestData.teamId2,
+        ")"
+      );
+      console.log("team2Name:", requestData.team2Name);
+      console.log("marketingAgreement:", requestData.marketingAgreement);
+
+      // 비밀번호 변경이 체크된 경우에만 비밀번호 필드 추가
+      if (formData.passwordChangeCheck === "Y") {
+        requestData.password = formData.password.trim();
+        requestData.newPassword = formData.newPassword.trim();
+        console.log(
+          "비밀번호 필드 추가됨 - password length:",
+          requestData.password.length,
+          "newPassword length:",
+          requestData.newPassword.length
+        );
+      } else {
+        console.log("비밀번호 변경 안함 - 비밀번호 필드 제외");
+      }
+
+      // 디버깅: 전송되는 데이터 로그
+      console.log("=== 회원정보 수정 API 요청 데이터 ===");
+      console.log("Request Data:", requestData);
+      console.log("FormData 객체:", formData);
+      console.log("선택된 리그:", selectedLeagues);
+      console.log("선택된 팀:", selectedTeams);
+
+      // 항상 FormData 사용 (서버가 multipart/form-data를 기대함)
+      const formDataToSend = new FormData();
+
+      // JSON 데이터를 'updateInfo' part로 추가 (서버에서 요구하는 part 이름)
+      const updateInfoBlob = new Blob([JSON.stringify(requestData)], {
+        type: "application/json",
+      });
+      formDataToSend.append("updateInfo", updateInfoBlob);
+
+      // 프로필 이미지가 있는 경우 추가
+      if (profileImage) {
+        formDataToSend.append("profileImage", profileImage);
+        console.log("프로필 이미지 포함하여 전송");
+      } else {
+        console.log("프로필 이미지 없이 전송");
+      }
+
+      // FormData 내용 로깅
+      console.log("=== FormData 내용 ===");
+      for (let [key, value] of formDataToSend.entries()) {
+        if (value instanceof Blob) {
+          console.log(`${key}:`, "Blob -", value.type, value.size + " bytes");
+        } else {
+          console.log(`${key}:`, value);
+        }
+      }
+
+      const response = await apiRequest("/api/v1/member/update", {
+        method: "PUT",
+        body: formDataToSend,
       });
 
-      console.log("회원가입 API 응답:", response);
+      console.log("=== API 응답 ===");
+      console.log("Response:", response);
+      console.log("Response type:", typeof response);
+      if (typeof response !== "string") {
+        console.log("Status Code:", response?.statusCode);
+        console.log("Status Message:", response?.statusMessage);
+        console.log("Response Data:", response?.data);
+      }
 
-      if (typeof response !== "string" && response.statusCode === "FO-200") {
-        // 회원가입 성공
-        setShowSuccessDialog(true);
+      if (
+        response &&
+        typeof response !== "string" &&
+        response.statusCode === "FO-200"
+      ) {
+        // 성공 시 마이페이지로 리다이렉트
+        router.push("/my-page");
       } else {
-        // 회원가입 실패 - 서버에서 반환한 오류 메시지 표시
-        const errorMsg =
-          typeof response !== "string" && response.data
-            ? (response.data as string)
-            : "회원가입에 실패했습니다. 다시 시도해주세요.";
-        setErrorMessage(errorMsg);
+        const errorMessage: string =
+          (typeof response !== "string" &&
+          typeof response?.statusMessage === "string"
+            ? response.statusMessage
+            : "") ||
+          (typeof response !== "string" && typeof response?.data === "string"
+            ? response.data
+            : "") ||
+          "회원정보 수정 중 오류가 발생했습니다.";
+
+        console.log("=== 에러 정보 ===");
+        console.log("Error Message:", errorMessage);
+        console.log(
+          "Full Response:",
+          JSON.stringify(response || "no response", null, 2)
+        );
+
+        setErrorMessage(errorMessage);
         setShowErrorDialog(true);
       }
     } catch (error) {
-      console.error("회원가입 API 오류:", error);
-      alert("회원가입 중 오류가 발생했습니다.");
+      console.error("회원정보 수정 API 오류:", error);
+
+      let errorMessage = "회원정보 수정 중 오류가 발생했습니다.";
+
+      if (error instanceof Error) {
+        if (error.message.includes("HTTP error! status: 400")) {
+          errorMessage =
+            "입력된 정보에 문제가 있습니다. 모든 필드를 올바르게 입력했는지 확인해주세요.";
+        } else if (error.message.includes("HTTP error! status: 401")) {
+          errorMessage = "인증이 만료되었습니다. 다시 로그인해주세요.";
+        } else if (error.message.includes("HTTP error! status: 500")) {
+          errorMessage = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        } else if (error.message.includes("서버에 연결할 수 없습니다")) {
+          errorMessage =
+            "서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      setErrorMessage(errorMessage);
+      setShowErrorDialog(true);
     }
   };
+
+  // 생년월일 업데이트 (YYYYMMDD 형식)
+  useEffect(() => {
+    if (formData.birthYear && formData.birthMonth && formData.birthDay) {
+      const year = formData.birthYear;
+      const month = formData.birthMonth.toString().padStart(2, "0");
+      const day = formData.birthDay.toString().padStart(2, "0");
+      const birthDate = `${year}${month}${day}`;
+      setFormData((prev) => ({
+        ...prev,
+        birthDate,
+      }));
+    }
+  }, [formData.birthYear, formData.birthMonth, formData.birthDay]);
+
+  // 컴포넌트 마운트 시 데이터 로드
+  useEffect(() => {
+    fetchUserInfo();
+    fetchLeagues();
+  }, [session]);
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 mt-20 mb-20">
@@ -800,7 +797,7 @@ const SignupPage = () => {
               className="text-[48px] font-extrabold text-[#1a1a1a] mb-2 leading-[62px]"
               style={{ fontFamily: "SUIT" }}
             >
-              {" 계정 생성 "}
+              {" 정보 수정 "}
             </h1>
           </div>
 
@@ -808,12 +805,65 @@ const SignupPage = () => {
             className="text-[18px] font-semibold text-[#1a1a1a] leading-[29px]"
             style={{ fontFamily: "SUIT" }}
           >
-            회원가입 후 Fillo를 이용해보세요.
+            개인 정보를 수정할 수 있습니다.
           </p>
         </div>
 
-        {/* 회원가입 폼 */}
+        {/* 회원정보 수정 폼 */}
         <form className="space-y-8" onSubmit={handleSubmit}>
+          {/* 프로필 이미지 섹션 - 회원가입 페이지에는 없지만 추가 */}
+          <div className="space-y-4">
+            <div>
+              <h3
+                className="text-[20px] font-semibold text-[#1a1a1a] mb-4"
+                style={{ fontFamily: "SUIT" }}
+              >
+                프로필 이미지
+              </h3>
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  {profileImagePreview ? (
+                    <img
+                      src={profileImagePreview}
+                      alt="프로필 미리보기"
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
+                  ) : (
+                    <DefaultProfile size="lg" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className="cursor-pointer">
+                    <div className="flex items-center space-x-2 px-4 py-2 border border-[#9400ea] rounded-lg bg-white text-[#9400ea] hover:bg-[#f3e6fc] transition-colors">
+                      <Upload className="w-4 h-4" />
+                      <span
+                        className="text-[14px] font-medium"
+                        style={{ fontFamily: "SUIT" }}
+                      >
+                        이미지 업로드
+                      </span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfileImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                  <p
+                    className="text-[12px] text-[#666666] mt-2"
+                    style={{ fontFamily: "SUIT" }}
+                  >
+                    JPG, PNG 파일만 업로드 가능합니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 구분선 */}
+          <div className="border-t border-[#f3e6fc]"></div>
+
           {/* 이메일 인증 섹션 */}
           <div className="space-y-4">
             <div>
@@ -827,93 +877,30 @@ const SignupPage = () => {
                 className="text-[12px] text-[#1a1a1a] mb-1"
                 style={{ fontFamily: "SUIT" }}
               >
-                로그인에 사용될 이메일 주소를 입력해주세요.
-              </p>
-              <p
-                className="text-[12px] text-[#1a1a1a] mb-4"
-                style={{ fontFamily: "SUIT" }}
-              >
-                이메일이 오지 않으면 스팸 메일함을 확인하시거나, 이메일 인증을
-                다시 눌러주세요.
+                이메일은 변경하실 수 없습니다.
               </p>
 
               <div className="flex space-x-2">
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  readOnly
                   placeholder="이메일 주소를 입력하세요."
-                  className="flex-1 h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                  className="flex-1 h-[48px] px-4 border border-[#dddddd] rounded-lg bg-[#f5f5f5] text-[18px] placeholder-[#999999] cursor-not-allowed"
                   style={{ fontFamily: "SUIT" }}
                 />
-                <button
-                  type="button"
-                  onClick={handleEmailVerification}
-                  className="h-[48px] px-4 bg-[#9400ea] text-white rounded-xl font-semibold text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea] whitespace-nowrap"
-                  style={{ fontFamily: "SUIT" }}
-                >
-                  이메일 인증
-                </button>
               </div>
-
-              <div className="flex space-x-2 mt-2 justify-between">
-                <input
-                  type="text"
-                  value={formData.emailVerificationCode}
-                  onChange={(e) =>
-                    handleInputChange("emailVerificationCode", e.target.value)
-                  }
-                  placeholder="인증번호 입력"
-                  maxLength={6}
-                  className="w-[150px] h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
-                  style={{ fontFamily: "SUIT" }}
-                />
-                <button
-                  type="button"
-                  onClick={handleVerificationCodeCheck}
-                  disabled={!isTimerActive || !authCode}
-                  className="h-[48px] px-4 bg-gray-500 text-white rounded-xl font-semibold text-[16px] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                  style={{ fontFamily: "SUIT" }}
-                >
-                  인증번호 확인
-                </button>
-              </div>
-
-              {isTimerActive && (
-                <p
-                  className="text-[12px] text-[#555555] mt-2"
-                  style={{ fontFamily: "SUIT" }}
-                >
-                  {formatTime(timeLeft)}
-                </p>
-              )}
-              {errors.email && (
-                <p
-                  className="text-[#e82239] text-[12px] mt-2"
-                  style={{ fontFamily: "SUIT" }}
-                >
-                  {errors.email}
-                </p>
-              )}
-              {errors.emailVerificationCode && (
-                <p
-                  className="text-[#e82239] text-[12px] mt-2"
-                  style={{ fontFamily: "SUIT" }}
-                >
-                  {errors.emailVerificationCode}
-                </p>
-              )}
             </div>
           </div>
 
           {/* 비밀번호 섹션 */}
-          <div className="space-y-4">
+          <div className="space-y-4 mb-10">
             <div>
               <h3
                 className="text-[20px] font-semibold text-[#1a1a1a] mb-2"
                 style={{ fontFamily: "SUIT" }}
               >
-                비밀번호
+                비밀번호 변경
               </h3>
               <p
                 className="text-[12px] text-[#1a1a1a] mb-4"
@@ -922,7 +909,49 @@ const SignupPage = () => {
                 영문, 숫자, 특수문자 포함 8~20자까지 입력하세요.
               </p>
 
-              <div className="space-y-2">
+              {/* 비밀번호 변경 체크박스 */}
+              <div className="relative flex flex-row items-center justify-between mb-6">
+                <span
+                  className="text-[16px] text-[#000000]"
+                  style={{ fontFamily: "SUIT" }}
+                >
+                  비밀번호를 변경하시겠습니까?
+                </span>
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={formData.passwordChangeCheck === "Y"}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "passwordChangeCheck",
+                        e.target.checked ? "Y" : "N"
+                      )
+                    }
+                    className="w-5 h-5 border-2 border-[#dddddd] rounded-sm focus:ring-2 focus:ring-[#9400ea] appearance-none bg-white checked:bg-[#9400ea] checked:border-[#9400ea]"
+                  />
+                  {formData.passwordChangeCheck === "Y" && (
+                    <svg
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-white pointer-events-none"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2 mb-8">
+                <h4
+                  className="text-[15px] font-semibold text-[#1a1a1a] mb-2"
+                  style={{ fontFamily: "SUIT" }}
+                >
+                  현재 비밀번호를 입력하세요.
+                </h4>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -931,7 +960,12 @@ const SignupPage = () => {
                       handleInputChange("password", e.target.value)
                     }
                     placeholder="비밀번호를 입력하세요."
-                    className="w-full h-[48px] px-4 pr-12 border border-[#9400ea] rounded-lg bg-white text-[18px] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    disabled={formData.passwordChangeCheck === "N"}
+                    className={`w-full h-[48px] px-4 pr-12 border rounded-lg text-[18px] placeholder-[#999999] ${
+                      formData.passwordChangeCheck === "N"
+                        ? "border-[#dddddd] bg-[#f5f5f5] cursor-not-allowed"
+                        : "border-[#9400ea] bg-white focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    }`}
                     style={{ fontFamily: "SUIT" }}
                   />
                   <button
@@ -950,21 +984,73 @@ const SignupPage = () => {
                     )}
                   </button>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4
+                  className="text-[15px] font-semibold text-[#1a1a1a] mb-2"
+                  style={{ fontFamily: "SUIT" }}
+                >
+                  변경할 비밀번호를 입력하세요.
+                </h4>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={formData.newPassword}
+                    onChange={(e) =>
+                      handleInputChange("newPassword", e.target.value)
+                    }
+                    placeholder="새 비밀번호를 입력하세요."
+                    disabled={formData.passwordChangeCheck === "N"}
+                    className={`w-full h-[48px] px-4 pr-12 border rounded-lg text-[18px] placeholder-[#999999] ${
+                      formData.passwordChangeCheck === "N"
+                        ? "border-[#dddddd] bg-[#f5f5f5] cursor-not-allowed"
+                        : "border-[#9400ea] bg-white focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    }`}
+                    style={{ fontFamily: "SUIT" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={formData.passwordChangeCheck === "N"}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                    tabIndex={0}
+                    aria-label={
+                      showPassword ? "비밀번호 숨기기" : "비밀번호 보기"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    )}
+                  </button>
+                </div>
 
                 <div className="relative">
                   <input
                     type={showPasswordConfirm ? "text" : "password"}
-                    value={formData.checkPassword}
+                    value={formData.newPasswordConfirm}
                     onChange={(e) =>
-                      handleInputChange("checkPassword", e.target.value)
+                      handleInputChange("newPasswordConfirm", e.target.value)
                     }
-                    placeholder="비밀번호를 다시 입력하세요."
-                    className="w-full h-[48px] px-4 pr-12 border border-[#9400ea] rounded-lg bg-white text-[18px] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    placeholder="새 비밀번호를 다시 입력하세요."
+                    disabled={formData.passwordChangeCheck === "N"}
+                    className={`w-full h-[48px] px-4 pr-12 border rounded-lg text-[18px] placeholder-[#999999] ${
+                      formData.passwordChangeCheck === "N"
+                        ? "border-[#dddddd] bg-[#f5f5f5] cursor-not-allowed"
+                        : formData.newPassword &&
+                          formData.newPasswordConfirm &&
+                          formData.newPassword !== formData.newPasswordConfirm
+                        ? "border-red-500 bg-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                        : "border-[#9400ea] bg-white focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    }`}
                     style={{ fontFamily: "SUIT" }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                    disabled={formData.passwordChangeCheck === "N"}
                     className="absolute inset-y-0 right-0 pr-4 flex items-center"
                     tabIndex={0}
                     aria-label={
@@ -978,6 +1064,19 @@ const SignupPage = () => {
                     )}
                   </button>
                 </div>
+
+                {/* 비밀번호 불일치 경고 메시지 */}
+                {formData.passwordChangeCheck === "Y" &&
+                  formData.newPassword &&
+                  formData.newPasswordConfirm &&
+                  formData.newPassword !== formData.newPasswordConfirm && (
+                    <p
+                      className="text-[#e82239] text-[12px] mt-2"
+                      style={{ fontFamily: "SUIT" }}
+                    >
+                      비밀번호가 일치하지 않습니다.
+                    </p>
+                  )}
               </div>
 
               {errors.password && (
@@ -1088,18 +1187,13 @@ const SignupPage = () => {
                   <span className="text-[#9400ea] font-bold">[필수]</span>{" "}
                   개인정보 수집 및 이용 동의
                 </span>
-                <input
-                  type="checkbox"
-                  checked={formData.personalInfoAgreement === "y"}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "personalInfoAgreement",
-                      e.target.checked ? "y" : "n"
-                    )
-                  }
-                  className="w-5 h-5 border-2 border-[#dddddd] rounded-sm focus:ring-2 focus:ring-[#9400ea] appearance-none bg-white checked:bg-[#9400ea] checked:border-[#9400ea]"
-                />
-                {formData.personalInfoAgreement === "y" && (
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={true}
+                    disabled={true}
+                    className="w-5 h-5 border-2 border-[#dddddd] rounded-sm appearance-none bg-[#9400ea] cursor-not-allowed"
+                  />
                   <svg
                     className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-white pointer-events-none"
                     fill="currentColor"
@@ -1111,7 +1205,7 @@ const SignupPage = () => {
                       clipRule="evenodd"
                     />
                   </svg>
-                )}
+                </div>
               </div>
 
               <div className="relative flex flex-row items-center justify-between">
@@ -1124,7 +1218,7 @@ const SignupPage = () => {
                     카카오톡 알림 메시지를 수신에 동의합니다.
                   </span>
                 </div>
-                <div>
+                <div className="relative">
                   <input
                     type="checkbox"
                     checked={formData.marketingAgreement === "y"}
@@ -1203,19 +1297,20 @@ const SignupPage = () => {
               >
                 성별
               </h3>
+              <p
+                className="text-[12px] text-[#666666] mb-4"
+                style={{ fontFamily: "SUIT" }}
+              >
+                성별은 변경하실 수 없습니다.
+              </p>
               <div className="flex space-x-6">
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex items-center space-x-2 cursor-not-allowed opacity-50">
                   <div className="relative">
                     <input
                       type="checkbox"
                       checked={formData.gender === "male"}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "gender",
-                          e.target.checked ? "male" : ""
-                        )
-                      }
-                      className="w-6 h-6 border-2 border-[#dddddd] rounded-sm focus:ring-2 focus:ring-[#9400ea] appearance-none bg-gray-100 checked:bg-[#9400ea] checked:border-[#9400ea]"
+                      disabled={true}
+                      className="w-6 h-6 border-2 border-[#dddddd] rounded-sm appearance-none bg-gray-100 checked:bg-[#9400ea] checked:border-[#9400ea] cursor-not-allowed"
                     />
                     {formData.gender === "male" && (
                       <svg
@@ -1238,18 +1333,13 @@ const SignupPage = () => {
                     남성
                   </span>
                 </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex items-center space-x-2 cursor-not-allowed opacity-50">
                   <div className="relative">
                     <input
                       type="checkbox"
                       checked={formData.gender === "female"}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "gender",
-                          e.target.checked ? "female" : ""
-                        )
-                      }
-                      className="w-6 h-6 border-2 border-[#dddddd] rounded-sm focus:ring-2 focus:ring-[#9400ea] appearance-none bg-gray-100 checked:bg-[#9400ea] checked:border-[#9400ea]"
+                      disabled={true}
+                      className="w-6 h-6 border-2 border-[#dddddd] rounded-sm appearance-none bg-gray-100 checked:bg-[#9400ea] checked:border-[#9400ea] cursor-not-allowed"
                     />
                     {formData.gender === "female" && (
                       <svg
@@ -1273,14 +1363,6 @@ const SignupPage = () => {
                   </span>
                 </label>
               </div>
-              {errors.gender && (
-                <p
-                  className="text-[#e82239] text-[12px] mt-2"
-                  style={{ fontFamily: "SUIT" }}
-                >
-                  {errors.gender}
-                </p>
-              )}
             </div>
           </div>
 
@@ -1754,68 +1836,18 @@ const SignupPage = () => {
             </div>
           </div>
 
-          {/* 회원가입 버튼 */}
+          {/* 회원정보 수정 버튼 */}
           <button
             type="submit"
-            className="w-full h-[54px] bg-[#9400ea] text-white rounded-xl font-semibold text-[16px] hover:bg-[#7e00c6] focus:outline-none focus:ring-2 focus:ring-[#9400ea] transition-all duration-200"
+            className="w-full h-[54px] bg-[#9400ea] text-white rounded-xl font-semibold text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea] transition-all duration-200"
             style={{ fontFamily: "SUIT" }}
           >
-            계정 생성
+            회원정보 수정 완료
           </button>
         </form>
       </div>
 
-      {/* 다이얼로그들 */}
-      {showTimeoutDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full">
-            <h3
-              className="text-lg font-semibold text-[#1a1a1a] mb-3"
-              style={{ fontFamily: "SUIT" }}
-            >
-              인증 시간 만료
-            </h3>
-            <p className="text-[#1a1a1a] mb-6" style={{ fontFamily: "SUIT" }}>
-              인증번호 입력 시간이 만료되었습니다. 다시 이메일 인증을
-              받아주세요.
-            </p>
-            <button
-              onClick={() => setShowTimeoutDialog(false)}
-              className="w-full h-[48px] bg-[#9400ea] text-white rounded-xl font-semibold text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
-              style={{ fontFamily: "SUIT" }}
-            >
-              확인
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showSuccessDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full">
-            <h3
-              className="text-lg font-semibold text-[#1a1a1a] mb-3"
-              style={{ fontFamily: "SUIT" }}
-            >
-              회원가입 완료
-            </h3>
-            <p className="text-[#1a1a1a] mb-6" style={{ fontFamily: "SUIT" }}>
-              회원가입이 성공적으로 완료되었습니다. 로그인 페이지로 이동합니다.
-            </p>
-            <button
-              onClick={() => {
-                setShowSuccessDialog(false);
-                window.location.href = "/auth/login";
-              }}
-              className="w-full h-[48px] bg-[#9400ea] text-white rounded-xl font-semibold text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
-              style={{ fontFamily: "SUIT" }}
-            >
-              로그인 페이지로 이동
-            </button>
-          </div>
-        </div>
-      )}
-
+      {/* 에러 다이얼로그 */}
       {showErrorDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full">
@@ -1823,7 +1855,7 @@ const SignupPage = () => {
               className="text-lg font-semibold text-[#1a1a1a] mb-3"
               style={{ fontFamily: "SUIT" }}
             >
-              회원가입 실패
+              회원정보 수정 실패
             </h3>
             <p
               className="text-[#1a1a1a] mb-6 whitespace-pre-line"
@@ -1846,6 +1878,4 @@ const SignupPage = () => {
       )}
     </div>
   );
-};
-
-export default SignupPage;
+}

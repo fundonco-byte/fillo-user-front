@@ -1,16 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button, TextInput } from "@/components/ui";
-import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { isValidPassword } from "@/lib/utils";
-import { useApi } from "@/hooks/useApi";
-import { createHeaders } from "@/lib/api";
+import Image from "next/image";
 
 const PasswordChangePage = () => {
   const router = useRouter();
-  const { data, execute, loading, error } = useApi();
+  const [email, setEmail] = useState("");
   const [formData, setFormData] = useState({
     password: "",
     checkPassword: "",
@@ -21,6 +19,20 @@ const PasswordChangePage = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // 세션 스토리지에서 인증된 이메일 가져오기
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const verifiedEmail = sessionStorage.getItem("verifiedEmail");
+      if (verifiedEmail) {
+        setEmail(verifiedEmail);
+      } else {
+        // 인증된 이메일이 없으면 이전 단계로 리다이렉트
+        alert("이메일 인증이 필요합니다. 이전 단계로 이동합니다.");
+        router.push("/password-reset");
+      }
+    }
+  }, [router]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -61,27 +73,54 @@ const PasswordChangePage = () => {
 
     if (!validateForm()) return;
 
+    if (!email) {
+      alert("이메일 정보가 없습니다. 이전 단계로 이동합니다.");
+      router.push("/password-reset");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // 비밀번호 변경 API 호출 (실제 구현 시 필요)
-      const response = await execute("/api/v1/member/update/password", {
-        method: "PUT",
-        headers: await createHeaders(true, true),
-        body: JSON.stringify({
-          password: formData.password,
-          checkPassword: formData.checkPassword,
-        }),
-      });
+      // JSON 형식으로 데이터 준비
+      const requestData = {
+        email: email,
+        password: formData.password,
+        checkPassword: formData.checkPassword,
+      };
 
-      if (typeof response !== "string" && response.statusCode === "FO-200") {
-        const res = response;
-        if (res.statusCode === "FO-200") {
-          alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
-          router.push("/auth/login");
+      // 직접 fetch를 사용하여 인증 헤더 없이 API 호출
+      const API_BASE_URL = "http://localhost:8093";
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/member/update/password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
         }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.statusCode === "FO-200") {
+        // 성공 시 세션 스토리지에서 이메일 정보 제거
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("verifiedEmail");
+        }
+        alert("비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.");
+        router.push("/auth/login");
       } else {
-        alert("비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
+        alert(
+          `비밀번호 변경에 실패했습니다: ${
+            result.statusMessage || "알 수 없는 오류"
+          }`
+        );
       }
     } catch (error) {
       console.error("비밀번호 변경 실패:", error);
@@ -91,204 +130,117 @@ const PasswordChangePage = () => {
     }
   };
 
-  const getPasswordStrength = (password: string) => {
-    if (password.length === 0) return { strength: 0, text: "", color: "" };
-
-    let score = 0;
-    const checks = {
-      length: password.length >= 8,
-      lowercase: /[a-z]/.test(password),
-      uppercase: /[A-Z]/.test(password),
-      number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    };
-
-    score = Object.values(checks).filter(Boolean).length;
-
-    if (score < 3) return { strength: 1, text: "약함", color: "text-red-500" };
-    if (score < 4)
-      return { strength: 2, text: "보통", color: "text-yellow-500" };
-    return { strength: 3, text: "강함", color: "text-green-500" };
-  };
-
-  const passwordStrength = getPasswordStrength(formData.password);
-
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
-      <div className="container-custom">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            {/* 헤더 */}
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-brand-primary to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Lock className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[400px] w-full">
+        <div className="bg-white">
+          {/* 단계 표시 */}
+          <div className="flex justify-center mb-4">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-[#9400ea] rounded-full flex items-center justify-center">
+                <span className="text-white text-base font-semibold">1</span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                비밀번호 재설정
-              </h1>
-              <p className="text-gray-600">새로운 비밀번호를 설정해주세요</p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* 새 비밀번호 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  새 비밀번호 <span className="text-accent-error">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPasswords.password ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) =>
-                      handleInputChange("password", e.target.value)
-                    }
-                    placeholder="새 비밀번호를 입력해주세요"
-                    className={`w-full px-4 py-3 pr-12 text-base text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all duration-200 ${
-                      errors.password
-                        ? "border-accent-error focus:ring-accent-error"
-                        : ""
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility("password")}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPasswords.password ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-
-                {/* 비밀번호 강도 표시 */}
-                {formData.password && (
-                  <div className="mt-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-gray-500">
-                        비밀번호 강도
-                      </span>
-                      <span
-                        className={`text-xs font-medium ${passwordStrength.color}`}
-                      >
-                        {passwordStrength.text}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          passwordStrength.strength === 1
-                            ? "bg-red-500"
-                            : passwordStrength.strength === 2
-                            ? "bg-yellow-500"
-                            : "bg-green-500"
-                        }`}
-                        style={{
-                          width: `${(passwordStrength.strength / 3) * 100}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-
-                {errors.password && (
-                  <p className="text-sm text-accent-error mt-2">
-                    {errors.password}
-                  </p>
-                )}
+              <div className="w-[19px] h-px bg-[#9400ea] mx-2"></div>
+              <div className="w-8 h-8 bg-[#9400ea] rounded-full flex items-center justify-center">
+                <span className="text-white text-base font-semibold">2</span>
               </div>
-
-              {/* 비밀번호 확인 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  비밀번호 확인 <span className="text-accent-error">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPasswords.checkPassword ? "text" : "password"}
-                    value={formData.checkPassword}
-                    onChange={(e) =>
-                      handleInputChange("checkPassword", e.target.value)
-                    }
-                    placeholder="비밀번호를 다시 입력해주세요"
-                    className={`w-full px-4 py-3 pr-12 text-base text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all duration-200 ${
-                      errors.checkPassword
-                        ? "border-accent-error focus:ring-accent-error"
-                        : ""
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => togglePasswordVisibility("checkPassword")}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPasswords.checkPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-
-                {/* 일치 확인 표시 */}
-                {formData.checkPassword && formData.password && (
-                  <div className="mt-2 flex items-center">
-                    {formData.password === formData.checkPassword ? (
-                      <div className="flex items-center text-green-500">
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        <span className="text-xs">비밀번호가 일치합니다</span>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-accent-error">
-                        비밀번호가 일치하지 않습니다
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {errors.checkPassword && (
-                  <p className="text-sm text-accent-error mt-2">
-                    {errors.checkPassword}
-                  </p>
-                )}
-              </div>
-
-              {/* 비밀번호 조건 안내 */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-blue-800 mb-2">
-                  비밀번호 조건
-                </h4>
-                <ul className="text-xs text-blue-700 space-y-1">
-                  <li>• 8자 이상</li>
-                  <li>• 영문자, 숫자, 특수문자 포함</li>
-                  <li>• 안전한 비밀번호를 사용하세요</li>
-                </ul>
-              </div>
-
-              {/* 제출 버튼 */}
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full"
-                isLoading={isLoading}
-                leftIcon={<Lock className="w-5 h-5" />}
-              >
-                비밀번호 변경하기
-              </Button>
-            </form>
-
-            {/* 뒤로가기 링크 */}
-            <div className="text-center mt-6">
-              <button
-                onClick={() => router.back()}
-                className="text-gray-600 hover:text-brand-primary transition-colors"
-              >
-                ← 뒤로가기
-              </button>
             </div>
           </div>
+
+          {/* 제목 */}
+          <h2 className="text-[48px] font-extrabold text-[#1a1a1a] text-center mb-16 leading-[62px]">
+            비밀번호 재설정
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* 새 비밀번호 */}
+            <div>
+              <label className="block text-[20px] font-semibold text-[#9400ea] mb-2 leading-[26px]">
+                비밀번호 재설정
+              </label>
+              <p className="text-[12px] text-[#1a1a1a] leading-[17px] mb-4">
+                영문, 숫자, 특수문자 포함 8~20자까지 입력하세요.
+              </p>
+
+              <div className="relative mb-4">
+                <input
+                  type={showPasswords.password ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) =>
+                    handleInputChange("password", e.target.value)
+                  }
+                  placeholder="새로운 비밀번호를 입력하세요."
+                  className={`w-full h-12 px-5 pr-12 border border-[#9400ea] rounded-lg text-[#1a1a1a] placeholder-[#999999] text-[18px] leading-[29px] focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:border-transparent transition-all duration-200 ${
+                    errors.password ? "border-red-500 focus:ring-red-500" : ""
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility("password")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPasswords.password ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+              {errors.password && (
+                <p className="text-sm text-red-600 mb-4">{errors.password}</p>
+              )}
+            </div>
+
+            {/* 비밀번호 확인 */}
+            <div className="mb-16">
+              <div className="relative mb-6">
+                <input
+                  type={showPasswords.checkPassword ? "text" : "password"}
+                  value={formData.checkPassword}
+                  onChange={(e) =>
+                    handleInputChange("checkPassword", e.target.value)
+                  }
+                  placeholder="새로운 비밀번호를 다시 입력하세요."
+                  className={`w-full h-12 px-5 pr-12 border border-[#9400ea] rounded-lg text-[#1a1a1a] placeholder-[#999999] text-[18px] leading-[29px] focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:border-transparent transition-all duration-200 ${
+                    errors.checkPassword
+                      ? "border-red-500 focus:ring-red-500"
+                      : ""
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility("checkPassword")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPasswords.checkPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+              {errors.checkPassword && (
+                <p className="text-sm text-red-600 mb-4">
+                  {errors.checkPassword}
+                </p>
+              )}
+            </div>
+
+            {/* 제출 버튼 */}
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                disabled={
+                  isLoading || !formData.password || !formData.checkPassword
+                }
+                className="w-4/5 h-[54px] bg-[#9400ea] text-white rounded-xl font-semibold text-base hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "변경 중..." : "완료"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

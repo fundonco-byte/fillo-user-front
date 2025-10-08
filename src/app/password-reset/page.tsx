@@ -3,29 +3,28 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Button, TextInput } from "@/components/ui";
-import { Mail, Clock, Shield } from "lucide-react";
-import { formatTime } from "@/lib/utils";
+import Image from "next/image";
 
 const PasswordResetPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(0);
   const [storedAuthCode, setStoredAuthCode] = useState("");
   const [error, setError] = useState("");
 
-  // 세션에서 이메일 가져오기
+  // 세션에서 이메일 가져오기 (선택사항)
   useEffect(() => {
     if (session?.user?.email) {
       setEmail(session.user.email);
-    } else {
-      router.push("/auth/login");
     }
-  }, [session, router]);
+    // 로그인하지 않은 상태에서도 비밀번호 찾기 페이지에 접근할 수 있도록 리다이렉트 제거
+  }, [session]);
 
   // 타이머 관리
   useEffect(() => {
@@ -51,6 +50,12 @@ const PasswordResetPage = () => {
     };
   }, [timer]);
 
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
   const handleSendVerificationCode = async () => {
     if (!email) {
       setError("이메일이 필요합니다.");
@@ -61,26 +66,26 @@ const PasswordResetPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        "http://1.234.75.29:8093/api/v1/member/email/authorize",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-          }),
-        }
-      );
+      // const API_URL = "http://1.234.75.29:8093/api/v1/member/email/authorize";
+      const API_URL = "http://localhost:8093/api/v1/member/email/authorize";
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
 
       const result = await response.json();
 
       if (result.statusCode === "FO-200") {
         setStoredAuthCode(result.data);
         setIsCodeSent(true);
-        setTimer(180); // 3분 = 180초
-        alert("인증 코드가 전송되었습니다. 3분 내에 입력해주세요.");
+        setTimer(300); // 5분 = 300초
+        alert("인증 코드가 전송되었습니다. 5분 내에 입력해주세요.");
       } else {
         setError(result.message || "인증 코드 전송에 실패했습니다.");
       }
@@ -99,8 +104,10 @@ const PasswordResetPage = () => {
     }
 
     if (verificationCode.trim() === storedAuthCode) {
-      // 인증 성공 - 비밀번호 재설정 페이지로 이동
-      router.push("/password-change");
+      // 인증 성공
+      setIsEmailVerified(true);
+      setError("");
+      alert("이메일 인증이 완료되었습니다.");
     } else {
       setError("올바르지 않은 인증 값입니다.");
       // 알림 다이얼로그 표시
@@ -113,6 +120,21 @@ const PasswordResetPage = () => {
     }
   };
 
+  const handleNextStep = () => {
+    if (!isEmailVerified) {
+      setError("먼저 이메일 인증을 완료해주세요.");
+      return;
+    }
+
+    // 인증된 이메일을 세션 스토리지에 저장
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("verifiedEmail", email);
+    }
+
+    // 비밀번호 변경 페이지로 이동
+    router.push("/password-change");
+  };
+
   const handleResendCode = () => {
     setVerificationCode("");
     setError("");
@@ -120,131 +142,129 @@ const PasswordResetPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
-      <div className="container-custom">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            {/* 헤더 */}
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-brand-primary to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[470px] w-full">
+        <div className="bg-white">
+          {/* 단계 표시 */}
+          <div className="flex justify-center mb-4">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-[#9400ea] rounded-full flex items-center justify-center">
+                <span className="text-white text-base font-semibold">1</span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                비밀번호 찾기
-              </h1>
-              <p className="text-gray-600">
-                이메일 인증을 통해 비밀번호를 재설정하세요
-              </p>
+              <div className="w-[19px] h-px bg-[#d9b6f6] mx-2"></div>
+              <div className="w-8 h-8 bg-[#d9b6f6] rounded-full flex items-center justify-center">
+                <span className="text-white text-base font-semibold">2</span>
+              </div>
             </div>
+          </div>
 
-            {/* 이메일 입력 */}
-            <div className="mb-6">
-              <TextInput
-                label="이메일"
-                type="email"
-                value={email}
-                placeholder={session?.user?.email || "이메일을 입력해주세요"}
-                disabled={true}
-                helperText="현재 로그인한 계정의 이메일입니다"
-              />
-            </div>
+          {/* 제목 */}
+          <h2 className="text-[48px] font-extrabold text-[#1a1a1a] text-center mb-16 leading-[62px]">
+            본인 인증
+          </h2>
 
-            {/* 인증 코드 전송 버튼 */}
-            {!isCodeSent ? (
-              <Button
-                onClick={handleSendVerificationCode}
-                variant="primary"
-                size="lg"
-                className="w-full mb-6"
-                isLoading={isLoading}
-                leftIcon={<Mail className="w-5 h-5" />}
-              >
-                이메일 인증
-              </Button>
-            ) : (
-              <div className="space-y-4 mb-6">
-                {/* 인증 코드 입력 */}
-                <TextInput
-                  label="인증 코드"
+          {/* 이메일 입력 */}
+          <div className="mb-6">
+            <label className="block text-[20px] font-semibold text-[#9400ea] mb-2 leading-[26px]">
+              아이디
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="회원가입 시 사용한 이메일 주소를 입력하세요."
+              className="w-full h-12 px-5 border border-[#9400ea] rounded-lg text-[#1a1a1a] placeholder-[#999999] text-[18px] leading-[29px] focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:border-transparent transition-all duration-200"
+            />
+          </div>
+
+          {/* 인증 코드 입력 */}
+          {isCodeSent && (
+            <div className="mb-4">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
                   value={verificationCode}
                   onChange={(e) => {
                     setVerificationCode(e.target.value);
                     setError("");
                   }}
-                  placeholder="인증 코드를 입력해주세요"
-                  error={error}
+                  placeholder="인증 번호를 입력하세요."
+                  className="flex-1 h-12 px-5 border border-[#9400ea] rounded-lg text-[#1a1a1a] placeholder-[#999999] text-[18px] leading-[29px] focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:border-transparent transition-all duration-200"
                 />
-
-                {/* 타이머와 완료 버튼 */}
-                <div className="flex items-center space-x-4">
-                  <Button
-                    onClick={handleVerifyCode}
-                    variant="primary"
-                    className="flex-1"
-                    disabled={!verificationCode.trim()}
-                  >
-                    완료
-                  </Button>
-
-                  {timer > 0 && (
-                    <div className="flex items-center text-accent-error font-medium">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {formatTime(timer)}
-                    </div>
-                  )}
-                </div>
-
-                {/* 재전송 버튼 */}
-                <Button
-                  onClick={handleResendCode}
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  disabled={timer > 0}
+                <button
+                  onClick={handleVerifyCode}
+                  disabled={!verificationCode.trim() || isEmailVerified}
+                  className={`w-[120px] h-12 rounded-xl font-semibold text-base focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isEmailVerified
+                      ? "bg-green-500 text-white"
+                      : "bg-[#9400ea] text-white hover:bg-[#7a00c7]"
+                  }`}
                 >
-                  인증 코드 재전송
-                </Button>
+                  {isEmailVerified ? "인증 완료" : "이메일 인증"}
+                </button>
               </div>
-            )}
-
-            {/* 에러 메시지 */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p className="text-red-600 text-sm">{error}</p>
-              </div>
-            )}
-
-            {/* 안내 메시지 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <Mail className="w-5 h-5 text-blue-400" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-blue-800">
-                    이메일을 확인해주세요
-                  </h3>
-                  <div className="mt-2 text-sm text-blue-700">
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>인증 코드는 3분간 유효합니다</li>
-                      <li>스팸 폴더도 확인해주세요</li>
-                      <li>코드가 오지 않으면 재전송 버튼을 눌러주세요</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+              {!isEmailVerified && timer > 0 && (
+                <p className="text-sm text-gray-600 mt-2">
+                  {formatTime(timer)}
+                </p>
+              )}
             </div>
+          )}
 
-            {/* 뒤로가기 링크 */}
-            <div className="text-center mt-6">
-              <button
-                onClick={() => router.back()}
-                className="text-gray-600 hover:text-brand-primary transition-colors"
-              >
-                ← 뒤로가기
-              </button>
+          {/* 비밀번호 입력 - 항상 노출 */}
+          <div className="mb-2">
+            <div className="flex space-x-2">
+              {!isCodeSent && (
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="인증 번호를 입력하세요."
+                  className="flex-1 h-12 px-5 border border-[#9400ea] rounded-lg text-[#1a1a1a] placeholder-[#999999] text-[18px] leading-[29px] focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:border-transparent transition-all duration-200"
+                />
+              )}
+              {!isCodeSent && (
+                <button
+                  onClick={handleSendVerificationCode}
+                  disabled={isLoading || !email.trim()}
+                  className="w-[120px] h-12 bg-[#9400ea] text-white rounded-xl font-semibold text-base hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea] focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "전송 중..." : "이메일 인증"}
+                </button>
+              )}
             </div>
           </div>
+
+          {/* 안내 메시지 */}
+          <div className="text-[12px] text-[#1a1a1a] leading-[17px] mb-12">
+            위 이메일 주소로 전송된 인증번호를 입력하세요.
+            <br />
+            이메일이 오지 않으면 스팸 메일함을 확인하시거나, 이메일 인증을 다시
+            눌러주세요.
+          </div>
+
+          {/* 다음 버튼 - 항상 노출 */}
+          <div className="flex justify-center">
+            <button
+              onClick={handleNextStep}
+              disabled={!isEmailVerified}
+              className={`w-4/5 h-[54px] rounded-xl font-semibold text-base focus:outline-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-6 ${
+                isEmailVerified
+                  ? "bg-[#9400ea] text-white hover:bg-[#7a00c7]"
+                  : "bg-gray-400 text-white"
+              }`}
+            >
+              다음
+            </button>
+          </div>
+
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="text-center text-sm text-red-600 mb-4">{error}</div>
+          )}
         </div>
       </div>
     </div>

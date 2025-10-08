@@ -75,8 +75,12 @@ const Navbar = () => {
               />
             </div>
           </Link> */}
-          <Link href="/pre-register" className="flex items-center space-x-2">
-            <div className="w-120 h-10 flex items-center justify-start">
+
+          <div className="w-120 h-10 flex items-center justify-start">
+            <Link
+              href="/pre-register"
+              className="flex items-center space-x-2 mr-10 text-brand-gray-900"
+            >
               <Image
                 src={"/assets/images/fillo_logo.png"}
                 alt="Fillo Logo"
@@ -84,8 +88,9 @@ const Navbar = () => {
                 height={80}
                 className="object-contain"
               />
-            </div>
-          </Link>
+            </Link>
+            <h5 className="font-bold">내가 찾던 팬덤 모임, Fillo</h5>
+          </div>
 
           {/* 데스크톱 메뉴 */}
           <div className="hidden md:flex items-center space-x-8">

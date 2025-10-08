@@ -3,7 +3,8 @@
 import { LoginRequest, ApiResponse, AuthTokens } from "@/types/auth";
 import { getSession } from "next-auth/react";
 
-const API_BASE_URL = "http://1.234.75.29:8093";
+// const API_BASE_URL = "http://1.234.75.29:8093";
+const API_BASE_URL = "http://localhost:8093";
 
 // 토큰 저장소 (fallback용)
 let authTokens: AuthTokens = {};
@@ -171,8 +172,26 @@ export const apiRequest = async <T = unknown>(
     });
 
     if (!response.ok) {
+      // 응답 본문을 읽어서 에러 정보 확인
+      let errorBody = "";
+      try {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          errorBody = JSON.stringify(errorData);
+          console.error("API 에러 응답:", errorData);
+        } else {
+          errorBody = await response.text();
+          console.error("API 에러 응답 (텍스트):", errorBody);
+        }
+      } catch (e) {
+        console.error("에러 응답 파싱 실패:", e);
+      }
+
       throw new Error(
-        `HTTP error! status: ${response.status} - ${response.statusText}`
+        `HTTP error! status: ${response.status} - ${response.statusText}${
+          errorBody ? ` - Body: ${errorBody}` : ""
+        }`
       );
     }
 
