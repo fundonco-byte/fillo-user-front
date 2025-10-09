@@ -49,7 +49,7 @@ export default {
       },
       fontFamily: {
         sans: [
-          "Pretendard",
+          "SUIT",
           "-apple-system",
           "BlinkMacSystemFont",
           "system-ui",

@@ -48,9 +48,10 @@ export const useApi = <T = unknown>(options: UseApiOptions = {}) => {
             return "Token-Expired";
           }
 
-          // FO-999는 이미 apiRequest에서 처리되므로 여기서는 제외
+          // FO-999는 apiRequest에서 이미 처리됨
+          // globalErrorHandler가 호출되어 자동으로 리다이렉트됨
           if (response.statusCode === "FO-999") {
-            // apiRequest에서 이미 globalErrorHandler가 호출됨
+            console.log("[토큰 만료] FO-999 감지 - 리다이렉트 처리 중");
             throw new Error("Token expired");
           }
 

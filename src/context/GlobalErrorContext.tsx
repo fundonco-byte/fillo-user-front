@@ -1,13 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode } from "react";
 import { signOut } from "next-auth/react";
 import { clearAuthTokens } from "@/lib/api";
 
 interface GlobalErrorContextType {
-  showTokenExpiredDialog: boolean;
   handleTokenExpired: () => void;
-  handleDialogConfirm: () => void;
 }
 
 const GlobalErrorContext = createContext<GlobalErrorContextType | undefined>(
@@ -29,26 +27,31 @@ interface GlobalErrorProviderProps {
 export const GlobalErrorProvider: React.FC<GlobalErrorProviderProps> = ({
   children,
 }) => {
-  const [showTokenExpiredDialog, setShowTokenExpiredDialog] = useState(false);
-
-  const handleTokenExpired = () => {
-    setShowTokenExpiredDialog(true);
-  };
-
-  const handleDialogConfirm = async () => {
-    setShowTokenExpiredDialog(false);
+  const handleTokenExpired = async () => {
+    console.log(
+      "[토큰 만료] FO-999 상태 코드 감지 - 토큰 초기화 및 리다이렉트 시작"
+    );
 
     try {
-      // 토큰 제거
+      // 1. localStorage 토큰 제거
       clearAuthTokens();
+      console.log("[토큰 만료] localStorage 토큰 제거 완료");
 
-      // NextAuth 세션 제거
+      // 2. NextAuth 세션 제거
       await signOut({ redirect: false });
+      console.log("[토큰 만료] NextAuth 세션 제거 완료");
 
-      // 사전 등록 페이지로 이동
+      // 3. sessionStorage 초기화 (혹시 있을 수 있는 다른 데이터)
+      if (typeof window !== "undefined") {
+        sessionStorage.clear();
+        console.log("[토큰 만료] sessionStorage 초기화 완료");
+      }
+
+      // 4. pre-register 페이지로 리다이렉트
+      console.log("[토큰 만료] pre-register 페이지로 리다이렉트");
       window.location.href = "/pre-register";
     } catch (error) {
-      console.error("로그아웃 처리 중 오류:", error);
+      console.error("[토큰 만료] 처리 중 오류 발생:", error);
       // 오류가 발생해도 사전 등록 페이지로 이동
       window.location.href = "/pre-register";
     }
@@ -57,34 +60,10 @@ export const GlobalErrorProvider: React.FC<GlobalErrorProviderProps> = ({
   return (
     <GlobalErrorContext.Provider
       value={{
-        showTokenExpiredDialog,
         handleTokenExpired,
-        handleDialogConfirm,
       }}
     >
       {children}
-
-      {/* 토큰 만료 다이얼로그 */}
-      {showTokenExpiredDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              세션 만료 알림
-            </h3>
-            <p className="text-gray-600 mb-6">
-              계정 유지 시간이 지났습니다. 다시 로그인해주세요.
-            </p>
-            <div className="flex justify-end">
-              <button
-                onClick={handleDialogConfirm}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                확인
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </GlobalErrorContext.Provider>
   );
 };

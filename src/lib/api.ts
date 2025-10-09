@@ -29,8 +29,19 @@ export const clearAuthTokens = () => {
   authTokens = {};
 
   if (typeof window !== "undefined") {
+    // localStorage 토큰 제거
     localStorage.removeItem("authorization");
     localStorage.removeItem("refreshToken");
+
+    // 기타 인증 관련 localStorage 항목 제거
+    // (필요에 따라 추가 항목 제거 가능)
+    const keysToRemove = Object.keys(localStorage).filter(
+      (key) =>
+        key.includes("auth") || key.includes("token") || key.includes("session")
+    );
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+
+    console.log("[clearAuthTokens] 모든 토큰 및 인증 정보 제거 완료");
   }
 };
 

@@ -784,20 +784,20 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 mt-20 mb-20">
-      <div className="w-full max-w-[600px] space-y-10">
+    <div className="min-h-screen bg-white flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 mt-16 sm:mt-20 mb-16 sm:mb-20">
+      <div className="w-full max-w-[600px] space-y-6 sm:space-y-10">
         {/* 헤더 섹션 */}
         <div className="text-center">
-          <div className="flex flex-row items-center justify-center mb-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center mb-4 gap-2">
             <Image
               src={"/assets/images/fillo_brand_text.png"}
               alt="Fillo Logo"
               width={115}
               height={58}
-              className="object-contain"
+              className="object-contain w-20 sm:w-24 lg:w-[115px]"
             />
             <h1
-              className="text-[48px] font-extrabold text-[#1a1a1a] mb-2 leading-[62px]"
+              className="text-3xl sm:text-4xl lg:text-[48px] font-extrabold text-[#1a1a1a] mb-2 leading-tight sm:leading-[62px]"
               style={{ fontFamily: "SUIT" }}
             >
               {" 계정 생성 "}
@@ -805,7 +805,7 @@ const SignupPage = () => {
           </div>
 
           <p
-            className="text-[18px] font-semibold text-[#1a1a1a] leading-[29px]"
+            className="text-base sm:text-[18px] font-semibold text-[#1a1a1a] leading-relaxed sm:leading-[29px]"
             style={{ fontFamily: "SUIT" }}
           >
             회원가입 후 Fillo를 이용해보세요.

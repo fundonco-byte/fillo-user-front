@@ -41,22 +41,22 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="gradient-bg-primary text-white py-16">
+      <section className="gradient-bg-primary text-white py-12 sm:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-4">
                 🏆 이번 주 HOT한 모임
               </div>
-              <h2 className="text-4xl font-bold mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
                 스포츠 열정을 함께할
                 <br />
                 완벽한 동료를 찾아보세요!
               </h2>
-              <p className="text-xl opacity-90 mb-6">
+              <p className="text-lg sm:text-xl opacity-90 mb-6">
                 AI 매칭으로 만나는 당신만의 스포츠 팬덤 커뮤니티
               </p>
-              <button className="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+              <button className="bg-white text-purple-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base">
                 지금 시작하기
               </button>
             </div>
@@ -93,7 +93,7 @@ export default function Home() {
       <CategorySlider />
 
       {/* Featured Content Sections */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
         {/* 인기 액티비티 */}
         <FeaturedSection
           title="인기 액티비티 🔥"
@@ -426,7 +426,7 @@ function CategorySlider() {
   };
 
   return (
-    <section className="py-12">
+    <section className="py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative">
           {/* 슬라이드 버튼 */}
@@ -450,16 +450,18 @@ function CategorySlider() {
           )}
 
           {/* 카테고리 그리드 */}
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-6 mx-8">
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 sm:gap-6 mx-4 sm:mx-8">
             {getCurrentItems().map((category) => (
               <Link href={category.link} key={category.name}>
                 <div className="text-center">
                   <div
-                    className={`w-16 h-16 rounded-full ${category.color} flex items-center justify-center text-2xl mb-2 mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md`}
+                    className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full ${category.color} flex items-center justify-center text-xl sm:text-2xl mb-2 mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md`}
                   >
                     {category.icon}
                   </div>
-                  <span className="text-sm text-gray-600">{category.name}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">
+                    {category.name}
+                  </span>
                 </div>
               </Link>
             ))}
@@ -535,11 +537,13 @@ function FeaturedSection({
   };
 
   return (
-    <section className="mb-12">
-      <div className="flex items-center justify-between mb-6">
+    <section className="mb-8 sm:mb-12">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-          <p className="text-gray-600">{subtitle}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+            {title}
+          </h2>
+          <p className="text-sm sm:text-base text-gray-600">{subtitle}</p>
         </div>
         <div className="flex items-center space-x-4">
           {/* 슬라이드 버튼 */}
@@ -594,19 +598,19 @@ function FeaturedSection({
                     onClick={() => handleItemClick(item.id)}
                     className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer group overflow-hidden"
                   >
-                    <div className="h-48 gradient-bg-light flex items-center justify-center text-4xl relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="h-40 sm:h-48 gradient-bg-light flex items-center justify-center text-3xl sm:text-4xl relative group-hover:scale-105 transition-transform duration-300">
                       {item.image}
-                      <div className="absolute top-3 left-3">
+                      <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
                         <span className="inline-block bg-white/90 backdrop-blur-sm text-purple-600 text-xs px-2 py-1 rounded-full font-medium">
                           {item.tag}
                         </span>
                       </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 truncate mb-2 group-hover:text-purple-600 transition-colors">
+                    <div className="p-3 sm:p-4">
+                      <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate mb-2 group-hover:text-purple-600 transition-colors">
                         {item.title}
                       </h3>
-                      <div className="space-y-1 text-sm text-gray-500 mb-3">
+                      <div className="space-y-1 text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
                         <div className="flex items-center justify-between">
                           <span>📅 {item.date}</span>
                           <span className="font-semibold text-purple-600">
@@ -617,7 +621,7 @@ function FeaturedSection({
                       </div>
                       <button
                         onClick={(e) => handleButtonClick(e, item.id)}
-                        className="w-full bg-purple-50 text-purple-600 py-2 rounded-lg font-medium hover:bg-purple-100 transition-colors"
+                        className="w-full bg-purple-50 text-purple-600 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-100 transition-colors"
                       >
                         자세히 보기
                       </button>

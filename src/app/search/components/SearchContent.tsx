@@ -200,21 +200,21 @@ export const SearchContent = () => {
   const categories = getCategories();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container-custom py-8">
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <div className="container-custom py-6 sm:py-8">
         {/* 검색 헤더 */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           {/* 필터 및 정렬 */}
-          <div className="search-filter-container p-4 rounded-xl shadow-sm">
-            <div className="flex flex-wrap gap-4 items-center justify-between">
-              <div className="flex flex-wrap gap-4 items-center">
+          <div className="search-filter-container p-3 sm:p-4 rounded-xl shadow-sm">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 items-start sm:items-center justify-between">
+              <div className="flex flex-wrap gap-3 sm:gap-4 items-center w-full sm:w-auto">
                 {/* 카테고리 필터 */}
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-purple-600" />
+                <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                  <Filter className="h-4 w-4 text-purple-600 flex-shrink-0" />
                   <select
                     value={filterCategory}
                     onChange={(e) => setFilterCategory(e.target.value)}
-                    className="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm"
+                    className="border border-gray-200 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm flex-1 sm:flex-none"
                   >
                     <option value="all">전체 카테고리</option>
                     {categories.map((category) => (
@@ -226,8 +226,8 @@ export const SearchContent = () => {
                 </div>
 
                 {/* 정렬 */}
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-purple-600" />
+                <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                  <SlidersHorizontal className="h-4 w-4 text-purple-600 flex-shrink-0" />
                   <select
                     value={sortBy}
                     onChange={(e) =>
@@ -235,7 +235,7 @@ export const SearchContent = () => {
                         e.target.value as "latest" | "popular" | "price"
                       )
                     }
-                    className="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm"
+                    className="border border-gray-200 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm flex-1 sm:flex-none"
                   >
                     <option value="latest">최신순</option>
                     <option value="popular">인기순</option>
@@ -245,7 +245,7 @@ export const SearchContent = () => {
               </div>
 
               {/* 결과 수 */}
-              <div className="text-sm text-gray-600 bg-purple-50 px-3 py-1.5 rounded-full">
+              <div className="text-xs sm:text-sm text-gray-600 bg-purple-50 px-3 py-1.5 rounded-full w-full sm:w-auto text-center">
                 총{" "}
                 <span className="font-semibold text-purple-600">
                   {filteredResults.length}
@@ -271,18 +271,18 @@ export const SearchContent = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
-            <div className="max-w-md mx-auto">
-              <Search className="h-16 w-16 text-gray-300 mx-auto mb-6" />
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+          <div className="text-center py-12 sm:py-16 bg-white rounded-xl shadow-sm">
+            <div className="max-w-md mx-auto px-4">
+              <Search className="h-12 w-12 sm:h-16 sm:w-16 text-gray-300 mx-auto mb-4 sm:mb-6" />
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
                 검색 결과가 없습니다
               </h3>
-              <p className="text-gray-600 mb-4 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">
                 {query
                   ? `"${query}"에 대한 검색 결과를 찾을 수 없습니다.`
                   : "검색어를 입력해주세요."}
               </p>
-              <div className="text-sm text-gray-500 bg-gray-50 p-4 rounded-lg">
+              <div className="text-xs sm:text-sm text-gray-500 bg-gray-50 p-3 sm:p-4 rounded-lg">
                 💡 검색 팁: 다른 검색어를 시도하거나 카테고리 필터를
                 조정해보세요.
               </div>

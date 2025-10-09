@@ -181,63 +181,63 @@ const MeetingDetailPage = () => {
         </div>
       </div> */}
 
-      <div className="container-custom py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="container-custom py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* 메인 콘텐츠 */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* 모임 이미지 및 기본 정보 */}
             <motion.div
-              className="bg-white rounded-2xl shadow-sm overflow-hidden"
+              className="bg-white rounded-xl sm:rounded-2xl shadow-sm overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="aspect-[16/9] bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center text-8xl relative">
+              <div className="aspect-[16/9] bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center text-6xl sm:text-7xl lg:text-8xl relative">
                 {meeting.image}
-                <div className="absolute top-4 left-4">
-                  <span className="inline-block bg-white/95 backdrop-blur-sm text-purple-600 px-3 py-1.5 rounded-full font-semibold text-sm shadow-sm">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
+                  <span className="inline-block bg-white/95 backdrop-blur-sm text-purple-600 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full font-semibold text-xs sm:text-sm shadow-sm">
                     {meeting.category}
                   </span>
                 </div>
               </div>
 
-              <div className="p-6">
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+              <div className="p-4 sm:p-5 lg:p-6">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
                   {meeting.title}
                 </h1>
 
-                <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  <div className="flex items-center text-gray-600">
-                    <Calendar className="h-5 w-5 mr-3 text-purple-500" />
-                    <span>
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-purple-500 flex-shrink-0" />
+                    <span className="truncate">
                       {meeting.date} {meeting.time}
                     </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <MapPin className="h-5 w-5 mr-3 text-purple-400" />
-                    <span>{meeting.location}</span>
+                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-purple-400 flex-shrink-0" />
+                    <span className="truncate">{meeting.location}</span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <Users className="h-5 w-5 mr-3 text-purple-600" />
+                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-purple-600 flex-shrink-0" />
                     <span>
                       {meeting.participants}/{meeting.maxParticipants}명 참여
                     </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <Star className="h-5 w-5 mr-3 text-yellow-500" />
+                  <div className="flex items-center text-gray-600 text-sm sm:text-base">
+                    <Star className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-yellow-500 flex-shrink-0" />
                     <span className="font-semibold text-purple-600">
                       {meeting.price}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   {/* 태그 */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {meeting.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="inline-block bg-purple-50 text-purple-600 text-sm px-3 py-1 rounded-full font-medium"
+                        className="inline-block bg-purple-50 text-purple-600 text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-medium"
                       >
                         #{tag}
                       </span>
@@ -245,13 +245,13 @@ const MeetingDetailPage = () => {
                   </div>
 
                   {/* 좋아요, 공유 */}
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 sm:space-x-3 self-end sm:self-auto">
                     <button
                       onClick={handleLikeToggle}
-                      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                      className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 transition-colors"
                     >
                       <Heart
-                        className={`h-5 w-5 ${
+                        className={`h-4 w-4 sm:h-5 sm:w-5 ${
                           isLiked
                             ? "text-red-500 fill-red-500"
                             : "text-gray-400 hover:text-red-500"
@@ -260,9 +260,9 @@ const MeetingDetailPage = () => {
                     </button>
                     <button
                       onClick={handleShare}
-                      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                      className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 transition-colors"
                     >
-                      <Share2 className="h-5 w-5 text-gray-600" />
+                      <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
                     </button>
                   </div>
                 </div>
@@ -271,7 +271,7 @@ const MeetingDetailPage = () => {
 
             {/* 탭 네비게이션 */}
             <motion.div
-              className="bg-white rounded-2xl shadow-sm overflow-hidden"
+              className="bg-white rounded-xl sm:rounded-2xl shadow-sm overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -280,7 +280,7 @@ const MeetingDetailPage = () => {
                 <div className="flex">
                   <button
                     onClick={() => setActiveTab("details")}
-                    className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                    className={`flex-1 py-3 px-4 sm:py-4 sm:px-6 text-center text-sm sm:text-base font-medium transition-colors ${
                       activeTab === "details"
                         ? "text-purple-600 border-b-2 border-purple-600 bg-purple-50"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -290,7 +290,7 @@ const MeetingDetailPage = () => {
                   </button>
                   <button
                     onClick={() => setActiveTab("reviews")}
-                    className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                    className={`flex-1 py-3 px-4 sm:py-4 sm:px-6 text-center text-sm sm:text-base font-medium transition-colors ${
                       activeTab === "reviews"
                         ? "text-purple-600 border-b-2 border-purple-600 bg-purple-50"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -301,16 +301,16 @@ const MeetingDetailPage = () => {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-5 lg:p-6">
                 {activeTab === "details" ? (
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {/* 상세 설명 */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">
                         모임 소개
                       </h3>
                       <div className="prose prose-gray max-w-none">
-                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                        <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line">
                           {meeting.detailedDescription}
                         </p>
                       </div>
@@ -319,18 +319,20 @@ const MeetingDetailPage = () => {
                     {/* 진행 일정 */}
                     {meeting.agenda && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                          <Clock className="h-5 w-5 mr-2 text-purple-500" />
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 flex items-center">
+                          <Clock className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-purple-500" />
                           진행 일정
                         </h3>
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {meeting.agenda.map((item, index) => (
                             <div
                               key={index}
-                              className="flex items-start bg-gray-50 rounded-lg p-3"
+                              className="flex items-start bg-gray-50 rounded-lg p-2.5 sm:p-3"
                             >
-                              <CheckCircle className="h-5 w-5 text-purple-500 mr-3 mt-0.5 flex-shrink-0" />
-                              <span className="text-gray-700">{item}</span>
+                              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
+                              <span className="text-sm sm:text-base text-gray-700">
+                                {item}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -340,17 +342,17 @@ const MeetingDetailPage = () => {
                     {/* 모임 규칙 */}
                     {meeting.rules && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                          <Shield className="h-5 w-5 mr-2 text-purple-600" />
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 flex items-center">
+                          <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-purple-600" />
                           모임 규칙
                         </h3>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                           {meeting.rules.map((rule, index) => (
                             <div
                               key={index}
-                              className="flex items-start text-gray-700"
+                              className="flex items-start text-sm sm:text-base text-gray-700"
                             >
-                              <span className="w-2 h-2 bg-purple-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>
+                              <span className="w-2 h-2 bg-purple-500 rounded-full mr-2 sm:mr-3 mt-2 flex-shrink-0"></span>
                               {rule}
                             </div>
                           ))}
@@ -361,17 +363,17 @@ const MeetingDetailPage = () => {
                     {/* 참여 조건 */}
                     {meeting.requirements && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                          <CheckCircle className="h-5 w-5 mr-2 text-purple-600" />
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 flex items-center">
+                          <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-purple-600" />
                           참여 조건
                         </h3>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                           {meeting.requirements.map((req, index) => (
                             <div
                               key={index}
-                              className="flex items-start text-gray-700"
+                              className="flex items-start text-sm sm:text-base text-gray-700"
                             >
-                              <span className="w-2 h-2 bg-purple-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>
+                              <span className="w-2 h-2 bg-purple-500 rounded-full mr-2 sm:mr-3 mt-2 flex-shrink-0"></span>
                               {req}
                             </div>
                           ))}
@@ -380,47 +382,51 @@ const MeetingDetailPage = () => {
                     )}
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {meeting.reviews && meeting.reviews.length > 0 ? (
                       meeting.reviews.map((review) => (
                         <div
                           key={review.id}
-                          className="border border-gray-200 rounded-lg p-4"
+                          className="border border-gray-200 rounded-lg p-3 sm:p-4"
                         >
-                          <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-start justify-between mb-2 sm:mb-3">
                             <div className="flex items-center">
-                              <div className="w-10 h-10 bg-gradient-to-br from-purple-50 to-pink-50 rounded-full flex items-center justify-center text-lg mr-3">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-50 to-pink-50 rounded-full flex items-center justify-center text-base sm:text-lg mr-2 sm:mr-3 flex-shrink-0">
                                 {review.userImage}
                               </div>
                               <div>
-                                <h4 className="font-medium text-gray-900">
+                                <h4 className="text-sm sm:text-base font-medium text-gray-900">
                                   {review.userName}
                                 </h4>
                                 <div className="flex items-center">
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
-                                      className={`h-4 w-4 ${
+                                      className={`h-3 w-3 sm:h-4 sm:w-4 ${
                                         i < review.rating
                                           ? "text-yellow-400 fill-yellow-400"
                                           : "text-gray-300"
                                       }`}
                                     />
                                   ))}
-                                  <span className="text-sm text-gray-500 ml-2">
+                                  <span className="text-xs sm:text-sm text-gray-500 ml-1.5 sm:ml-2">
                                     {review.date}
                                   </span>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <p className="text-gray-700">{review.comment}</p>
+                          <p className="text-sm sm:text-base text-gray-700">
+                            {review.comment}
+                          </p>
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        <MessageCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                        <p>아직 후기가 없습니다.</p>
+                      <div className="text-center py-6 sm:py-8 text-gray-500">
+                        <MessageCircle className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 sm:mb-3 text-gray-300" />
+                        <p className="text-sm sm:text-base">
+                          아직 후기가 없습니다.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -430,22 +436,22 @@ const MeetingDetailPage = () => {
           </div>
 
           {/* 사이드바 */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* 참여하기 카드 */}
             <motion.div
-              className="bg-white rounded-2xl shadow-sm p-6 sticky top-24"
+              className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-5 lg:p-6 lg:sticky lg:top-24"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-purple-600 mb-2">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">
                   {meeting.price}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-xs sm:text-sm text-gray-600">
                   현재 {meeting.participants}명이 참여 중
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 sm:mt-3">
                   <div
                     className="bg-purple-600 h-2 rounded-full transition-all duration-300"
                     style={{
@@ -460,12 +466,12 @@ const MeetingDetailPage = () => {
               {loginCheck ? (
                 <button
                   onClick={handleJoinMeeting}
-                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-sm hover:shadow-md mb-4"
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-sm hover:shadow-md mb-3 sm:mb-4"
                 >
                   모임 참여하기
                 </button>
               ) : (
-                <button className="w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white-200 py-4 rounded-xl font-semibold shadow-sm mb-4">
+                <button className="w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white-200 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold shadow-sm mb-3 sm:mb-4">
                   모임 참여하기
                 </button>
               )}
@@ -484,35 +490,35 @@ const MeetingDetailPage = () => {
             {/* 주최자 정보 */}
             {meeting.organizerProfile && (
               <motion.div
-                className="bg-white rounded-2xl shadow-sm p-6"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-5 lg:p-6"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                   주최자 정보
                 </h3>
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-50 to-pink-50 rounded-full flex items-center justify-center text-xl mr-4">
+                <div className="flex items-center mb-3 sm:mb-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-50 to-pink-50 rounded-full flex items-center justify-center text-lg sm:text-xl mr-3 sm:mr-4 flex-shrink-0">
                     {meeting.organizerProfile.profileImage || "👨‍💼"}
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">
+                    <h4 className="text-sm sm:text-base font-medium text-gray-900">
                       {meeting.organizerProfile.name}
                     </h4>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Star className="h-4 w-4 text-yellow-400 fill-yellow-400 mr-1" />
+                    <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                      <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-yellow-400 mr-1" />
                       {meeting.organizerProfile.rating}
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2 text-sm text-gray-600">
+                <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                   <div className="flex items-center">
-                    <Award className="h-4 w-4 mr-2 text-purple-500" />총{" "}
-                    {meeting.organizerProfile.totalMeetings}회 모임 주최
+                    <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-purple-500 flex-shrink-0" />
+                    총 {meeting.organizerProfile.totalMeetings}회 모임 주최
                   </div>
                   <div className="flex items-center">
-                    <User className="h-4 w-4 mr-2 text-purple-400" />
+                    <User className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-purple-400 flex-shrink-0" />
                     {meeting.organizerProfile.joinDate} 가입
                   </div>
                 </div>

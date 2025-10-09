@@ -4,6 +4,7 @@ import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -19,6 +20,8 @@ type CarouselProps = {
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
   setApi?: (api: CarouselApi) => void;
+  autoplay?: boolean;
+  autoplayDelay?: number;
 };
 
 type CarouselContextProps = {
@@ -47,18 +50,33 @@ function Carousel({
   opts,
   setApi,
   plugins,
+  autoplay = false,
+  autoplayDelay = 3000,
   className,
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
+  const autoplayPlugin = React.useMemo(
+    () =>
+      autoplay
+        ? [
+            Autoplay({
+              delay: autoplayDelay,
+              stopOnInteraction: false,
+              stopOnMouseEnter: true,
+            }),
+          ]
+        : [],
+    [autoplay, autoplayDelay]
+  );
+
   const [carouselRef, api] = useEmblaCarousel(
     {
+      loop: true,
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
-      loop: true,
-      startIndex: 2,
     },
-    plugins
+    plugins || autoplayPlugin
   );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -146,7 +164,7 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
       <div
         className={cn(
           "flex",
-          orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
+          orientation === "horizontal" ? "" : "flex-col",
           className
         )}
         {...props}
@@ -163,11 +181,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
       role="group"
       aria-roledescription="slide"
       data-slot="carousel-item"
-      className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? "pl-4" : "pt-4",
-        className
-      )}
+      className={cn("min-w-0 shrink-0 grow-0", className)}
       {...props}
     />
   );

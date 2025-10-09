@@ -77,39 +77,39 @@ const LoginPage = () => {
   }, [status, router]);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-[550px] flex flex-col mx-auto items-center justify-center">
         {/* 로고와 제목 */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-6">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex items-center justify-center mb-4 sm:mb-6">
             <Image
               src="/assets/images/fillo-logo-icon.png"
               alt="Fillo Logo"
               width={64}
               height={64}
-              className="object-contain mr-2"
+              className="object-contain mr-2 w-12 h-12 sm:w-16 sm:h-16"
             />
           </div>
-          <p className="text-xl font-semibold text-[#1a1a1a] mb-6">
+          <p className="text-lg sm:text-xl font-semibold text-[#1a1a1a] mb-4 sm:mb-6">
             만나다, 공유하다, 응원하다
           </p>
-          <h3 className="text-[40px] flex items-center justify-center font-extrabold text-[#1a1a1a] leading-[48px] mb-2">
-            내가 찾던 팬덤 모임,
+          <h3 className="text-2xl sm:text-3xl lg:text-[40px] flex flex-col sm:flex-row items-center justify-center font-extrabold text-[#1a1a1a] leading-tight sm:leading-[48px] mb-2 gap-2">
+            <span>내가 찾던 팬덤 모임,</span>
             <Image
               src="/assets/images/fillo_brand_text.png"
               alt="Fillo Logo"
               width={100}
               height={100}
-              className="object-contain ml-2"
+              className="object-contain w-20 h-20 sm:w-24 sm:h-24 lg:w-[100px] lg:h-[100px]"
             />
           </h3>
         </div>
 
         {/* 로그인 폼 */}
-        <div className="space-y-6 max-w-[423px] ">
+        <div className="space-y-4 sm:space-y-6 w-full max-w-[423px]">
           {/* 아이디 입력 */}
           <div>
-            <label className="block text-xl font-semibold text-[#9400ea] mb-2">
+            <label className="block text-lg sm:text-xl font-semibold text-[#9400ea] mb-2">
               아이디
             </label>
             <input
@@ -118,14 +118,14 @@ const LoginPage = () => {
               value={email}
               onChange={handleEmailChange}
               placeholder="이메일 주소를 입력하세요."
-              className="w-full h-12 px-5 border-2 border-[#9400ea] rounded-lg text-lg text-[#1a1a1a] placeholder-[#999999] focus:outline-none focus:border-[#9400ea] bg-white"
+              className="w-full h-11 sm:h-12 px-4 sm:px-5 border-2 border-[#9400ea] rounded-lg text-base sm:text-lg text-[#1a1a1a] placeholder-[#999999] focus:outline-none focus:border-[#9400ea] bg-white"
               required
             />
           </div>
 
           {/* 비밀번호 입력 */}
           <div>
-            <label className="block text-xl font-semibold text-[#9400ea] mb-2">
+            <label className="block text-lg sm:text-xl font-semibold text-[#9400ea] mb-2">
               비밀번호
             </label>
             <div className="relative">
@@ -134,7 +134,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={handlePasswordChange}
                 placeholder="비밀번호를 입력하세요."
-                className="w-full h-12 px-5 pr-12 border-2 border-[#9400ea] rounded-lg text-lg text-[#1a1a1a] placeholder-[#999999] focus:outline-none focus:border-[#9400ea] bg-white"
+                className="w-full h-11 sm:h-12 px-4 sm:px-5 pr-12 border-2 border-[#9400ea] rounded-lg text-base sm:text-lg text-[#1a1a1a] placeholder-[#999999] focus:outline-none focus:border-[#9400ea] bg-white"
                 required
               />
               <button
@@ -156,13 +156,13 @@ const LoginPage = () => {
             type="submit"
             onClick={handleEmailLogin}
             disabled={isLoading}
-            className="w-full h-[54px] bg-[#9400ea] text-white text-base font-semibold rounded-xl hover:bg-[#7e00c6] transition-colors disabled:opacity-50"
+            className="w-full h-12 sm:h-[54px] bg-[#9400ea] text-white text-sm sm:text-base font-semibold rounded-xl hover:bg-[#7e00c6] transition-colors disabled:opacity-50"
           >
             {isLoading ? "로그인 중..." : "로그인"}
           </button>
 
           {/* 링크들 */}
-          <div className="flex justify-center space-x-6 text-base text-[#999999]">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-0 sm:space-x-6 text-sm sm:text-base text-[#999999]">
             <Link href="/find-id" className="hover:text-[#1a1a1a]">
               아이디 찾기
             </Link>

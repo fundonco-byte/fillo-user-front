@@ -16,6 +16,7 @@ import {
 import { useApi } from "@/hooks/useApi";
 import { createHeaders } from "@/lib/api";
 import Image from "next/image";
+import KakaoChatButton from "@/components/KakaoChatButton";
 
 // 날짜 형식을 안전하게 변환하는 유틸리티 함수
 const formatDateSafely = (dateValue: string | null | undefined): string => {
@@ -230,38 +231,41 @@ const MyPage = () => {
   }
 
   return (
-    <div ref={pageRef} className="min-h-screen bg-white py-8">
+    <div
+      ref={pageRef}
+      className="min-h-screen bg-white py-6 sm:py-8 px-4 sm:px-6 lg:px-8"
+    >
       <div className="container-custom">
         <div className="max-w-2xl mx-auto">
           {/* 페이지 헤더 */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 card-hover">
-            <div className="text-center mb-8">
+          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 mb-6 sm:mb-8 card-hover">
+            <div className="text-center mb-6 sm:mb-8">
               <div className="relative mx-auto mb-4">
                 {userInfo.profileImage ? (
                   <img
                     src={userInfo.profileImage}
                     alt="프로필"
-                    className="w-24 h-24 rounded-full object-cover mx-auto"
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover mx-auto"
                   />
                 ) : (
                   <DefaultProfile size="lg" />
                 )}
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 {userInfo.nickName}님의 프로필
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 가입일: {formatDateSafely(userInfo.joinDate)}
               </p>
             </div>
           </div>
 
           {/* 읽기 모드 */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* 기본 정보 */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 card-hover">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 card-hover">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                   기본 정보
                 </h2>
                 <button
@@ -317,11 +321,11 @@ const MyPage = () => {
             </div>
 
             {/* 응원 팀 정보 */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 card-hover">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 card-hover">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
                 응원 팀 정보
               </h2>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* 첫 번째 팀 */}
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden bg-gray-100">
@@ -391,8 +395,10 @@ const MyPage = () => {
             </div>
 
             {/* 설정 */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 card-hover">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">설정</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 card-hover">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
+                설정
+              </h2>
               <div className="space-y-4">
                 {/* <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center">
@@ -424,12 +430,13 @@ const MyPage = () => {
                       </p>
                     </div>
                   </div>
-                  <button
+                  {/* <button
                     onClick={handleKakaoInquiry}
                     className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 rounded-lg font-medium transition-colors"
                   >
                     문의
-                  </button>
+                  </button> */}
+                  <KakaoChatButton />
                 </div>
               </div>
             </div>
