@@ -163,10 +163,10 @@ const LoginPage = () => {
 
           {/* 링크들 */}
           <div className="flex flex-wrap justify-center gap-3 sm:gap-0 sm:space-x-6 text-sm sm:text-base text-[#999999]">
-            <Link href="/find-id" className="hover:text-[#1a1a1a]">
+            {/* <Link href="/find-id" className="hover:text-[#1a1a1a]">
               아이디 찾기
             </Link>
-            <span>|</span>
+            <span>|</span> */}
             <Link href="/password-reset" className="hover:text-[#1a1a1a]">
               비밀번호 찾기
             </Link>

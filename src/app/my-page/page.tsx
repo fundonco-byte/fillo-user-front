@@ -154,6 +154,13 @@ const MyPage = () => {
       if (typeof res !== "string" && res.statusCode === "FO-200") {
         const userInfo = res.data as UserInfo;
         if (userInfo) {
+          console.log("📊 사용자 정보:", userInfo);
+          console.log("📊 두 번째 팀 정보:", {
+            leagueId2: userInfo.leagueId2,
+            teamId2: userInfo.teamId2,
+            league2Name: userInfo.league2Name,
+            team2Name: userInfo.team2Name,
+          });
           setUserInfo(userInfo);
         }
       } else {
@@ -239,24 +246,30 @@ const MyPage = () => {
         <div className="max-w-2xl mx-auto">
           {/* 페이지 헤더 */}
           <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 mb-6 sm:mb-8 card-hover">
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="relative mx-auto mb-4">
+            <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8">
+              <div className="relative flex-shrink-0 mb-4 sm:mb-6">
                 {userInfo.profileImage ? (
                   <img
                     src={userInfo.profileImage}
                     alt="프로필"
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover mx-auto"
+                    className="w-40 h-40 sm:w-56 sm:h-56 rounded-full object-cover"
                   />
                 ) : (
-                  <DefaultProfile size="lg" />
+                  <DefaultProfile
+                    size="xl"
+                    className="w-40 h-40 sm:w-56 sm:h-56"
+                  />
                 )}
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-                {userInfo.nickName}님의 프로필
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-600">
-                가입일: {formatDateSafely(userInfo.joinDate)}
-              </p>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                  {userInfo.nickName ? userInfo.nickName : userInfo.name}님의
+                  프로필
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  가입일: {formatDateSafely(userInfo.joinDate)}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -325,7 +338,20 @@ const MyPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
                 응원 팀 정보
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div
+                className={`grid gap-4 sm:gap-6 ${
+                  userInfo.leagueId2 > 0 &&
+                  userInfo.teamId2 > 0 &&
+                  userInfo.league2Name &&
+                  userInfo.league2Name.trim() !== "" &&
+                  userInfo.league2Name !== "0" &&
+                  userInfo.team2Name &&
+                  userInfo.team2Name.trim() !== "" &&
+                  userInfo.team2Name !== "0"
+                    ? "grid-cols-1 sm:grid-cols-2"
+                    : "grid-cols-1 max-w-xs mx-auto"
+                }`}
+              >
                 {/* 첫 번째 팀 */}
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden bg-gray-100">
@@ -342,6 +368,12 @@ const MyPage = () => {
                             return "/assets/images/league/seriea.png";
                           case "리그앙":
                             return "/assets/images/league/league1.png";
+                          case "국가대표팀":
+                            return "/assets/images/league/national_team.png";
+                          case "K리그":
+                            return "/assets/images/league/kleague.png";
+                          case "기타":
+                            return "/assets/images/league/world.png";
                           default:
                             return "/assets/images/freeagent.png";
                         }
@@ -359,38 +391,51 @@ const MyPage = () => {
                 </div>
 
                 {/* 두 번째 팀 (있는 경우) */}
-                {userInfo.leagueId2 && userInfo.leagueId2 > 0 && (
-                  <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden bg-gray-100">
-                      <img
-                        src={(() => {
-                          switch (userInfo.league2Name) {
-                            case "프리미어리그":
-                              return "/assets/images/league/premierleague.png";
-                            case "라리가":
-                              return "/assets/images/league/laliga.png";
-                            case "분데스리가":
-                              return "/assets/images/league/bundesliga.png";
-                            case "세리에A":
-                              return "/assets/images/league/seriea.png";
-                            case "리그앙":
-                              return "/assets/images/league/league1.png";
-                            default:
-                              return "/assets/images/freeagent.png";
-                          }
-                        })()}
-                        alt={userInfo.league2Name}
-                        className="w-full h-full object-contain p-2"
-                      />
+                {userInfo.leagueId2 > 0 &&
+                  userInfo.teamId2 > 0 &&
+                  userInfo.league2Name &&
+                  userInfo.league2Name.trim() !== "" &&
+                  userInfo.league2Name !== "0" &&
+                  userInfo.team2Name &&
+                  userInfo.team2Name.trim() !== "" &&
+                  userInfo.team2Name !== "0" && (
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden bg-gray-100">
+                        <img
+                          src={(() => {
+                            switch (userInfo.league2Name) {
+                              case "프리미어리그":
+                                return "/assets/images/league/premierleague.png";
+                              case "라리가":
+                                return "/assets/images/league/laliga.png";
+                              case "분데스리가":
+                                return "/assets/images/league/bundesliga.png";
+                              case "세리에A":
+                                return "/assets/images/league/seriea.png";
+                              case "리그앙":
+                                return "/assets/images/league/league1.png";
+                              case "국가대표팀":
+                                return "/assets/images/league/national_team.png";
+                              case "K리그":
+                                return "/assets/images/league/kleague.png";
+                              case "기타":
+                                return "/assets/images/league/world.png";
+                              default:
+                                return "/assets/images/freeagent.png";
+                            }
+                          })()}
+                          alt={userInfo.league2Name}
+                          className="w-full h-full object-contain p-2"
+                        />
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {userInfo.league2Name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {userInfo.team2Name}
+                      </p>
                     </div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {userInfo.league2Name || "등록되지 않음"}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {userInfo.team2Name || "등록되지 않음"}
-                    </p>
-                  </div>
-                )}
+                  )}
               </div>
             </div>
 

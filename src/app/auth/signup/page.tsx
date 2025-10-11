@@ -42,129 +42,21 @@ interface FormErrors {
   agreeTerms?: string;
 }
 
-// 리그별 팀 데이터
-const leagueTeams = (league: League) => [
-  {
-    leagueId: 1,
-    leagueName: "프리미어리그",
-    relatedTeams: [
-      {
-        teamId: 1,
-        teamName: "아스날",
-      },
-      {
-        teamId: 2,
-        teamName: "첼시",
-      },
-      {
-        teamId: 3,
-        teamName: "맨시티",
-      },
-      {
-        teamId: 4,
-        teamName: "맨유",
-      },
-      {
-        teamId: 5,
-        teamName: "리버풀",
-      },
-      {
-        teamId: 6,
-        teamName: "토트넘",
-      },
-      {
-        teamId: 7,
-        teamName: "뉴캐슬",
-      },
-    ],
-  },
-  {
-    leagueId: 2,
-    leagueName: "라리가",
-    relatedTeams: [
-      {
-        teamId: 1,
-        teamName: "바르셀로나",
-      },
-      {
-        teamId: 2,
-        teamName: "레알 마드리드",
-      },
-    ],
-  },
-  {
-    leagueId: 3,
-    leagueName: "분데스리가",
-    relatedTeams: [
-      {
-        teamId: 1,
-        teamName: "바이에른 뮌헨",
-      },
-      {
-        teamId: 2,
-        teamName: "도르트문트",
-      },
-      {
-        teamId: 3,
-        teamName: "레버쿠젠",
-      },
-    ],
-  },
-  {
-    leagueId: 4,
-    leagueName: "세리에A",
-    relatedTeams: [
-      {
-        teamId: 1,
-        teamName: "인터밀란",
-      },
-      {
-        teamId: 2,
-        teamName: "AC밀란",
-      },
-      {
-        teamId: 3,
-        teamName: "유벤투스",
-      },
-      {
-        teamId: 4,
-        teamName: "아탈란타",
-      },
-      {
-        teamId: 5,
-        teamName: "AS로마",
-      },
-    ],
-  },
-  {
-    leagueId: 5,
-    leagueName: "리그앙",
-    relatedTeams: [
-      {
-        teamId: 1,
-        teamName: "PSG",
-      },
-      {
-        teamId: 2,
-        teamName: "리옹",
-      },
-      {
-        teamId: 3,
-        teamName: "마르세유",
-      },
-    ],
-  },
-  {
-    leagueId: 0,
-    leagueName: "없음",
-    relatedTeams: [
-      {
-        teamId: 0,
-        teamName: "없음",
-      },
-    ],
-  },
-];
+// 리그 이미지 매핑
+const getLeagueImage = (leagueId: number): string => {
+  const imageMap: Record<number, string> = {
+    1: "/assets/images/league/premierleague.png",
+    2: "/assets/images/league/laliga.png",
+    3: "/assets/images/league/bundesliga.png",
+    4: "/assets/images/league/seriea.png",
+    5: "/assets/images/league/league1.png",
+    6: "/assets/images/league/national_team.png",
+    7: "/assets/images/league/kleague.png",
+    8: "/assets/images/league/world.png",
+    0: "/assets/images/freeagent.png",
+  };
+  return imageMap[leagueId] || "/assets/images/league/world.png";
+};
 
 const SignupPage = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -200,7 +92,7 @@ const SignupPage = () => {
   const { data, execute, loading, error } = useApi();
   const isInitialLoad = useRef(false); // API 호출이 한 번만 실행되도록 ref 사용
   const [leagues, setLeagues] = useState<League[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
+  const [teamsMap, setTeamsMap] = useState<Record<number, Team[]>>({});
 
   // 이메일 인증 관련 상태
   const [authCode, setAuthCode] = useState<string>("");
@@ -427,63 +319,61 @@ const SignupPage = () => {
 
   const getAvailableTeams = async (leagueId: number) => {
     if (leagueId === 0) {
-      // leagueId가 0 (없음)인 경우 "없음" 팀만 설정
-      setTeams([{ teamId: 0, teamName: "없음", leagueId: 0 }]);
-      // "없음" 팀 자동 선택
-      setFormData((prev) => ({
-        ...prev,
-        teamId: 0,
-      }));
-      // return [];
-    } else {
-      try {
-        const response = await execute(
-          "/api/v1/team/all?leagueId=" + leagueId,
-          {
-            headers: await createHeaders(false),
-            method: "GET",
-          }
-        );
+      // leagueId가 0 (없음)인 경우 처리
+      return;
+    }
 
-        const res = response;
+    // 이미 로드된 팀 데이터가 있으면 재사용
+    if (teamsMap[leagueId]) {
+      return teamsMap[leagueId];
+    }
 
-        if (typeof res !== "string" && res.statusCode === "FO-200") {
-          const teamData = res.data;
+    try {
+      const response = await execute("/api/v1/team/all?leagueId=" + leagueId, {
+        headers: await createHeaders(false),
+        method: "GET",
+      });
 
-          if (!teamData || !Array.isArray(teamData)) {
-            console.warn("유효하지 않은 팀 API 응답:", teamData);
-            setTeams([]);
-            return [];
-          }
+      const res = response;
 
-          const getTeamList = teamData
-            .map((team: Team) => {
-              if (!team || typeof team.teamId === "undefined") {
-                console.warn("유효하지 않은 팀 데이터:", team);
-                return null;
-              }
+      if (typeof res !== "string" && res.statusCode === "FO-200") {
+        const teamData = res.data;
 
-              console.log("로드된 팀 데이터:", team);
-              return team;
-            })
-            .filter((team: Team | null): team is Team => team !== null);
-
-          if (getTeamList.length > 0) {
-            setTeams(getTeamList);
-            console.log(`${getTeamList.length}개의 팀 데이터를 로드했습니다.`);
-            console.log("로드된 팀 데이터:", getTeamList);
-          } else {
-            setTeams([]);
-            console.log("해당 리그에 팀 데이터가 없습니다.");
-          }
-        } else {
-          console.warn("팀 목록 API 응답 예외 오류 발생");
-          setTeams([]);
+        if (!teamData || !Array.isArray(teamData)) {
+          console.warn("유효하지 않은 팀 API 응답:", teamData);
+          return [];
         }
-      } catch (error) {
-        console.error("팀 목록 API 호출 중 오류 발생:", error);
-        setTeams([]);
+
+        const getTeamList = teamData
+          .map((team: Team) => {
+            if (!team || typeof team.teamId === "undefined") {
+              console.warn("유효하지 않은 팀 데이터:", team);
+              return null;
+            }
+
+            return team;
+          })
+          .filter((team: Team | null): team is Team => team !== null);
+
+        if (getTeamList.length > 0) {
+          // teamsMap에 저장
+          setTeamsMap((prev) => ({
+            ...prev,
+            [leagueId]: getTeamList,
+          }));
+          console.log(`${getTeamList.length}개의 팀 데이터를 로드했습니다.`);
+          return getTeamList;
+        } else {
+          console.log("해당 리그에 팀 데이터가 없습니다.");
+          return [];
+        }
+      } else {
+        console.warn("팀 목록 API 응답 예외 오류 발생");
+        return [];
       }
+    } catch (error) {
+      console.error("팀 목록 API 호출 중 오류 발생:", error);
+      return [];
     }
   };
 
@@ -1390,56 +1280,9 @@ const SignupPage = () => {
 
               {/* 리그 선택 그리드 */}
               <div className="grid grid-cols-5 gap-4 mb-6">
-                {[
-                  {
-                    id: 1,
-                    name: "프리미어리그",
-                    image: "/assets/images/league/premierleague.png",
-                  },
-                  {
-                    id: 2,
-                    name: "스페인 라리가",
-                    image: "/assets/images/league/laliga.png",
-                  },
-                  {
-                    id: 3,
-                    name: "분데스리가",
-                    image: "/assets/images/league/bundesliga.png",
-                  },
-                  {
-                    id: 4,
-                    name: "세리에A",
-                    image: "/assets/images/league/seriea.png",
-                  },
-                  {
-                    id: 5,
-                    name: "K리그",
-                    image: "/assets/images/league/kleague.png",
-                  },
-                  {
-                    id: 6,
-                    name: "기타",
-                    image: "/assets/images/league/world.png",
-                  },
-                  {
-                    id: 7,
-                    name: "KBO",
-                    image: "/assets/images/league/kbo.png",
-                  },
-                  {
-                    id: 8,
-                    name: "국가대표(한국)",
-                    image: "/assets/images/league/national_team.png",
-                  },
-                  {
-                    id: 0,
-                    name: "없음",
-                    image: "/assets/images/freeagent.png",
-                  },
-                ].map((league) => {
-                  const isSelected =
-                    selectedLeagues.includes(league.id) ||
-                    (league.id === 0 && selectedLeagues.length === 0);
+                {/* API로 가져온 리그 목록 표시 */}
+                {leagues.map((league) => {
+                  const isSelected = selectedLeagues.includes(league.leagueId);
 
                   // 동일한 리그에서 2개 팀이 선택된 경우 다른 리그 비활성화
                   const hasTwoTeamsFromSameLeague = selectedTeams.some(
@@ -1451,20 +1294,19 @@ const SignupPage = () => {
                     }
                   );
 
-                  const isDisabled =
-                    !isSelected && hasTwoTeamsFromSameLeague && league.id !== 0;
+                  const isDisabled = !isSelected && hasTwoTeamsFromSameLeague;
 
                   return (
                     <div
-                      key={league.id}
+                      key={league.leagueId}
                       className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
                         isDisabled ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
                       <div className="w-16 h-16 mb-2 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
                         <Image
-                          src={league.image}
-                          alt={league.name}
+                          src={getLeagueImage(league.leagueId)}
+                          alt={league.leagueName}
                           width={64}
                           height={64}
                           className="w-full h-full object-contain"
@@ -1474,14 +1316,16 @@ const SignupPage = () => {
                         className="text-[12px] text-center leading-[17px] mb-2"
                         style={{ fontFamily: "SUIT" }}
                       >
-                        {league.name}
+                        {league.leagueName}
                       </span>
                       <div className="relative">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           disabled={isDisabled}
-                          onChange={() => handleLeagueSelection(league.id)}
+                          onChange={() =>
+                            handleLeagueSelection(league.leagueId)
+                          }
                           className="w-4 h-4 border-2 border-[#dddddd] rounded-sm focus:ring-2 focus:ring-[#9400ea] appearance-none bg-gray-100 checked:bg-[#9400ea] checked:border-[#9400ea] disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         {isSelected && (
@@ -1501,6 +1345,54 @@ const SignupPage = () => {
                     </div>
                   );
                 })}
+
+                {/* "없음" 옵션 추가 */}
+                {(() => {
+                  const isSelected = selectedLeagues.length === 0;
+                  return (
+                    <div
+                      key={0}
+                      className="flex flex-col items-center p-2 rounded-lg transition-all duration-200"
+                    >
+                      <div className="w-16 h-16 mb-2 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                        <Image
+                          src="/assets/images/freeagent.png"
+                          alt="없음"
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <span
+                        className="text-[12px] text-center leading-[17px] mb-2"
+                        style={{ fontFamily: "SUIT" }}
+                      >
+                        없음
+                      </span>
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleLeagueSelection(0)}
+                          className="w-4 h-4 border-2 border-[#dddddd] rounded-sm focus:ring-2 focus:ring-[#9400ea] appearance-none bg-gray-100 checked:bg-[#9400ea] checked:border-[#9400ea]"
+                        />
+                        {isSelected && (
+                          <svg
+                            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 text-white pointer-events-none"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* 선택된 리그 표시 */}
@@ -1514,16 +1406,9 @@ const SignupPage = () => {
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedLeagues.map((leagueId) => {
-                      const league = [
-                        { id: 1, name: "프리미어리그" },
-                        { id: 2, name: "스페인 라리가" },
-                        { id: 3, name: "분데스리가" },
-                        { id: 4, name: "세리에A" },
-                        { id: 5, name: "K리그" },
-                        { id: 6, name: "기타" },
-                        { id: 7, name: "KBO" },
-                        { id: 8, name: "국가대표(한국)" },
-                      ].find((l) => l.id === leagueId);
+                      const league = leagues.find(
+                        (l) => l.leagueId === leagueId
+                      );
 
                       return (
                         <span
@@ -1531,7 +1416,7 @@ const SignupPage = () => {
                           className="px-3 py-1 bg-[#9400ea] text-white rounded-full text-[14px]"
                           style={{ fontFamily: "SUIT" }}
                         >
-                          {league?.name}
+                          {league?.leagueName}
                         </span>
                       );
                     })}
@@ -1576,21 +1461,11 @@ const SignupPage = () => {
                     팀 선택 (최대 2개):
                   </h4>
                   {selectedLeagues.map((leagueId) => {
-                    const league = [
-                      { id: 1, name: "프리미어리그" },
-                      { id: 2, name: "스페인 라리가" },
-                      { id: 3, name: "분데스리가" },
-                      { id: 4, name: "세리에A" },
-                      { id: 5, name: "K리그" },
-                      { id: 6, name: "기타" },
-                      { id: 7, name: "KBO" },
-                      { id: 8, name: "국가대표(한국)" },
-                    ].find((l) => l.id === leagueId);
+                    const league = leagues.find((l) => l.leagueId === leagueId);
+                    if (!league) return null;
 
-                    const currentLeague = leagues.find(
-                      (l) => l.leagueId === leagueId
-                    );
-                    if (!currentLeague) return null;
+                    // 해당 리그의 팀 목록 가져오기
+                    const teamsForLeague = teamsMap[leagueId] || [];
 
                     // 해당 리그에서 선택된 팀들
                     const selectedTeamsInLeague = selectedTeams.filter(
@@ -1603,7 +1478,7 @@ const SignupPage = () => {
                           className="text-[14px] font-medium text-[#1a1a1a]"
                           style={{ fontFamily: "SUIT" }}
                         >
-                          {league?.name} 팀 선택:
+                          {league.leagueName} 팀 선택:
                         </label>
                         <select
                           className="w-full h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
@@ -1615,10 +1490,12 @@ const SignupPage = () => {
                             e.target.value = "";
                           }}
                         >
-                          <option value="">팀을 선택하세요</option>
-                          {leagueTeams(currentLeague)[
-                            leagueId - 1
-                          ]?.relatedTeams.map((team) => {
+                          <option value="">
+                            {teamsForLeague.length === 0
+                              ? "팀 정보를 불러오는 중..."
+                              : "팀을 선택하세요"}
+                          </option>
+                          {teamsForLeague.map((team) => {
                             // 이미 선택된 팀은 옵션에서 제외
                             const isAlreadySelected = selectedTeams.some(
                               (selectedTeam) =>
@@ -1644,9 +1521,7 @@ const SignupPage = () => {
                           <div className="flex flex-wrap gap-2 mt-2">
                             {selectedTeamsInLeague.map(
                               (teamSelection, index) => {
-                                const team = leagueTeams(currentLeague)[
-                                  leagueId - 1
-                                ]?.relatedTeams.find(
+                                const team = teamsForLeague.find(
                                   (t) => t.teamId === teamSelection.teamId
                                 );
 
@@ -1693,27 +1568,14 @@ const SignupPage = () => {
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedTeams.map((teamSelection, index) => {
-                      const league = [
-                        { id: 1, name: "프리미어리그" },
-                        { id: 2, name: "스페인 라리가" },
-                        { id: 3, name: "분데스리가" },
-                        { id: 4, name: "세리에A" },
-                        { id: 5, name: "K리그" },
-                        { id: 6, name: "기타" },
-                        { id: 7, name: "KBO" },
-                        { id: 8, name: "국가대표" },
-                      ].find((l) => l.id === teamSelection.leagueId);
-
-                      const currentLeague = leagues.find(
+                      const league = leagues.find(
                         (l) => l.leagueId === teamSelection.leagueId
                       );
-                      const team = currentLeague
-                        ? leagueTeams(currentLeague)[
-                            teamSelection.leagueId - 1
-                          ]?.relatedTeams.find(
-                            (t) => t.teamId === teamSelection.teamId
-                          )
-                        : null;
+                      const teamsForLeague =
+                        teamsMap[teamSelection.leagueId] || [];
+                      const team = teamsForLeague.find(
+                        (t) => t.teamId === teamSelection.teamId
+                      );
 
                       return (
                         <span
@@ -1721,7 +1583,7 @@ const SignupPage = () => {
                           className="px-3 py-1 bg-[#7a00c7] text-white rounded-full text-[14px]"
                           style={{ fontFamily: "SUIT" }}
                         >
-                          {league?.name} - {team?.teamName}
+                          {league?.leagueName} - {team?.teamName}
                         </span>
                       );
                     })}
