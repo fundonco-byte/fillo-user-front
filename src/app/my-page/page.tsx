@@ -240,7 +240,7 @@ const MyPage = () => {
   return (
     <div
       ref={pageRef}
-      className="min-h-screen bg-white py-6 sm:py-8 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-white py-6 sm:py-8 px-4 sm:px-6 lg:px-8 mt-20 mb-20"
     >
       <div className="container-custom">
         <div className="max-w-2xl mx-auto">
