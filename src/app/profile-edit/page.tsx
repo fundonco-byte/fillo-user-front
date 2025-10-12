@@ -161,7 +161,7 @@ export default function ProfileEditPage() {
         let birthDay = 1;
 
         if (data.birthDate) {
-          let dateStr = data.birthDate.replace(/-/g, ""); // YYYY-MM-DD -> YYYYMMDD
+          const dateStr = data.birthDate.replace(/-/g, ""); // YYYY-MM-DD -> YYYYMMDD
           if (dateStr.length === 8) {
             birthYear = parseInt(dateStr.substring(0, 4));
             birthMonth = parseInt(dateStr.substring(4, 6));
@@ -495,7 +495,7 @@ export default function ProfileEditPage() {
       }
 
       // 요청 데이터 구성 (서버 형식에 맞게)
-      const requestData: any = {
+      const requestData: Record<string, string | number> = {
         name: formData.name.trim(),
         passwordChangeCheck: formData.passwordChangeCheck,
         birthDate: formData.birthDate,
@@ -601,7 +601,7 @@ export default function ProfileEditPage() {
 
       // FormData 내용 로깅
       console.log("=== FormData 내용 ===");
-      for (let [key, value] of formDataToSend.entries()) {
+      for (const [key, value] of formDataToSend.entries()) {
         if (value instanceof Blob) {
           console.log(`${key}:`, "Blob -", value.type, value.size + " bytes");
         } else {
@@ -1030,9 +1030,9 @@ export default function ProfileEditPage() {
                     className="text-xs sm:text-sm lg:text-[14px] text-[#1a1a1a] leading-relaxed sm:leading-[20px]"
                     style={{ fontFamily: "SUIT" }}
                   >
-                    본 약관은 Fillo 서비스(이하 "서비스")의 이용과 관련하여
-                    회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을
-                    목적으로 합니다.
+                    본 약관은 Fillo 서비스(이하 &quot;서비스&quot;)의 이용과
+                    관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을
+                    규정함을 목적으로 합니다.
                   </p>
 
                   <h4
@@ -1045,15 +1045,15 @@ export default function ProfileEditPage() {
                     className="text-xs sm:text-sm lg:text-[14px] text-[#1a1a1a] leading-relaxed sm:leading-[20px]"
                     style={{ fontFamily: "SUIT" }}
                   >
-                    1. "서비스"란 회사가 제공하는 축구 팬 커뮤니티 및 관련
-                    서비스를 의미합니다.
+                    1. &quot;서비스&quot;란 회사가 제공하는 축구 팬 커뮤니티 및
+                    관련 서비스를 의미합니다.
                     <br />
-                    2. "이용자"란 서비스에 접속하여 본 약관에 따라 서비스를
-                    이용하는 회원을 의미합니다.
+                    2. &quot;이용자&quot;란 서비스에 접속하여 본 약관에 따라
+                    서비스를 이용하는 회원을 의미합니다.
                     <br />
-                    3. "회원"이란 서비스에 개인정보를 제공하여 회원등록을 한
-                    자로서, 서비스의 정보를 지속적으로 제공받으며 서비스를
-                    계속적으로 이용할 수 있는 자를 의미합니다.
+                    3. &quot;회원&quot;이란 서비스에 개인정보를 제공하여
+                    회원등록을 한 자로서, 서비스의 정보를 지속적으로 제공받으며
+                    서비스를 계속적으로 이용할 수 있는 자를 의미합니다.
                   </p>
 
                   <h4

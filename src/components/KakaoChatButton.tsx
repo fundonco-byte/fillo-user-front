@@ -2,9 +2,26 @@
 
 import { useEffect, useRef } from "react";
 
+interface KakaoChannel {
+  createChatButton: (options: {
+    container: HTMLElement | null;
+    channelPublicId: string | undefined;
+    size: string;
+    color: string;
+    shape: string;
+    title: string;
+  }) => void;
+}
+
+interface KakaoSDK {
+  isInitialized: () => boolean;
+  init: (key: string | undefined) => void;
+  Channel: KakaoChannel;
+}
+
 declare global {
   interface Window {
-    Kakao: any;
+    Kakao: KakaoSDK;
   }
 }
 
