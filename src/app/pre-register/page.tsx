@@ -216,13 +216,13 @@ const PreRegisterPage = () => {
     const fetchCurrentUsers = async () => {
       try {
         setLoading(true);
-        console.log("[API 호출] 사전 등록 사용자 수 조회");
+        // console.log("[API 호출] 사전 등록 사용자 수 조회");
 
         const response = await apiRequest("/api/v1/member/pre-registration", {
           method: "GET",
         });
 
-        console.log("[API 응답] 사전 등록 사용자 수:", response);
+        // console.log("[API 응답] 사전 등록 사용자 수:", response);
 
         if (
           response.statusCode === "FO-200" &&
@@ -230,12 +230,12 @@ const PreRegisterPage = () => {
         ) {
           setCurrentUsers(response.data);
         } else {
-          console.warn("[API 경고] 예상과 다른 응답 형식:", response);
+          // console.warn("[API 경고] 예상과 다른 응답 형식:", response);
           // 응답이 예상과 다르면 기본값 유지
           setCurrentUsers(0);
         }
       } catch (error) {
-        console.error("[API 에러] 사전 등록 사용자 수 조회 실패:", error);
+        // console.error("[API 에러] 사전 등록 사용자 수 조회 실패:", error);
         // 에러 발생 시 기본값 유지
         setCurrentUsers(0);
       } finally {

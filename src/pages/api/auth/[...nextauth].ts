@@ -46,7 +46,7 @@ export default NextAuth({
 
           return null;
         } catch (error) {
-          console.error("Login API error:", error);
+          // console.error("Login API error:", error);
           return null;
         }
       },

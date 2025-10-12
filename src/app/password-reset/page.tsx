@@ -96,7 +96,7 @@ const PasswordResetPage = () => {
         setError(result.message || "인증 코드 전송에 실패했습니다.");
       }
     } catch (error) {
-      console.error("API 호출 오류:", error);
+      // console.error("API 호출 오류:", error);
       setError("서버 연결에 실패했습니다.");
     } finally {
       setIsLoading(false);

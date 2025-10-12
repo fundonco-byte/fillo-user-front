@@ -22,7 +22,7 @@ import KakaoChatButton from "@/components/KakaoChatButton";
 const formatDateSafely = (dateValue: string | null | undefined): string => {
   if (!dateValue) return "등록되지 않음";
 
-  console.log("formatDateSafely 입력값:", dateValue, "타입:", typeof dateValue);
+  // console.log("formatDateSafely 입력값:", dateValue, "타입:", typeof dateValue);
 
   try {
     // 숫자형 문자열인 경우 (YYYYMMDD 형식)
@@ -33,7 +33,7 @@ const formatDateSafely = (dateValue: string | null | undefined): string => {
       const parsedDate = new Date(year, month, day);
 
       if (!isNaN(parsedDate.getTime()) && year > 1900 && year < 2100) {
-        console.log("YYYYMMDD 형식 파싱 성공:", parsedDate);
+        // console.log("YYYYMMDD 형식 파싱 성공:", parsedDate);
         return parsedDate.toLocaleDateString("ko-KR");
       }
     }
@@ -49,7 +49,7 @@ const formatDateSafely = (dateValue: string | null | undefined): string => {
           !isNaN(timestampDate.getTime()) &&
           timestampDate.getFullYear() > 1970
         ) {
-          console.log("Unix timestamp 파싱 성공:", timestampDate);
+          // console.log("Unix timestamp 파싱 성공:", timestampDate);
           return timestampDate.toLocaleDateString("ko-KR");
         }
       }
@@ -59,7 +59,7 @@ const formatDateSafely = (dateValue: string | null | undefined): string => {
         // 2001년 이후
         const timestampDate = new Date(numericValue);
         if (!isNaN(timestampDate.getTime())) {
-          console.log("밀리초 timestamp 파싱 성공:", timestampDate);
+          // console.log("밀리초 timestamp 파싱 성공:", timestampDate);
           return timestampDate.toLocaleDateString("ko-KR");
         }
       }
@@ -68,7 +68,7 @@ const formatDateSafely = (dateValue: string | null | undefined): string => {
     // ISO 8601 형식 처리
     const date = new Date(dateValue);
     if (!isNaN(date.getTime()) && date.getFullYear() > 1970) {
-      console.log("ISO 형식 파싱 성공:", date);
+      // console.log("ISO 형식 파싱 성공:", date);
       return date.toLocaleDateString("ko-KR");
     }
 
@@ -81,7 +81,7 @@ const formatDateSafely = (dateValue: string | null | undefined): string => {
         parseInt(day)
       );
       if (!isNaN(parsedDate.getTime()) && parseInt(year) > 1970) {
-        console.log("YYYY-MM-DD 형식 파싱 성공:", parsedDate);
+        // console.log("YYYY-MM-DD 형식 파싱 성공:", parsedDate);
         return parsedDate.toLocaleDateString("ko-KR");
       }
     }
@@ -95,15 +95,15 @@ const formatDateSafely = (dateValue: string | null | undefined): string => {
         parseInt(day)
       );
       if (!isNaN(parsedDate.getTime()) && parseInt(year) > 1970) {
-        console.log("DD/MM/YYYY 형식 파싱 성공:", parsedDate);
+        // console.log("DD/MM/YYYY 형식 파싱 성공:", parsedDate);
         return parsedDate.toLocaleDateString("ko-KR");
       }
     }
 
-    console.warn("모든 날짜 파싱 시도 실패:", dateValue);
+    // console.warn("모든 날짜 파싱 시도 실패:", dateValue);
     return "유효하지 않은 날짜";
   } catch (error) {
-    console.error("날짜 변환 오류:", error, "입력값:", dateValue);
+    // console.error("날짜 변환 오류:", error, "입력값:", dateValue);
     return "날짜 형식 오류";
   }
 };
@@ -154,25 +154,25 @@ const MyPage = () => {
       if (typeof res !== "string" && res.statusCode === "FO-200") {
         const userInfo = res.data as UserInfo;
         if (userInfo) {
-          console.log("📊 사용자 정보:", userInfo);
-          console.log("📊 두 번째 팀 정보:", {
-            leagueId2: userInfo.leagueId2,
-            teamId2: userInfo.teamId2,
-            league2Name: userInfo.league2Name,
-            team2Name: userInfo.team2Name,
-          });
+          // console.log("📊 사용자 정보:", userInfo);
+          // console.log("📊 두 번째 팀 정보:", {
+          //   leagueId2: userInfo.leagueId2,
+          //   teamId2: userInfo.teamId2,
+          //   league2Name: userInfo.league2Name,
+          //   team2Name: userInfo.team2Name,
+          // });
           setUserInfo(userInfo);
         }
       } else {
         if (res === "Token-Expired") {
-          console.error("사용자 정보 불러오기 실패:", res);
+          // console.error("사용자 정보 불러오기 실패:", res);
           router.push("/auth/login");
         } else {
-          console.error("사용자 정보 불러오기 실패:", res.statusMessage);
+          // console.error("사용자 정보 불러오기 실패:", res.statusMessage);
         }
       }
     } catch (error) {
-      console.error("API 호출 오류:", error);
+      // console.error("API 호출 오류:", error);
     } finally {
       setIsLoading(false);
     }

@@ -126,13 +126,13 @@ const SignupPage = () => {
 
           // 응답 데이터 검증
           if (!leagueData || !Array.isArray(leagueData)) {
-            console.warn("유효하지 않은 리그 API 응답:", leagueData);
+            // console.warn("유효하지 않은 리그 API 응답:", leagueData);
             return;
           }
 
           // 데이터가 비어있는 경우 처리
           if (leagueData.length === 0) {
-            console.log("반환된 리그 데이터가 없습니다.");
+            // console.log("반환된 리그 데이터가 없습니다.");
             return;
           }
 
@@ -140,7 +140,7 @@ const SignupPage = () => {
             .map((league: League) => {
               // 각 멤버 데이터의 필수 필드 검증
               if (!league || typeof league.leagueId === "undefined") {
-                console.warn("유효하지 않은 리그 데이터:", league);
+                // console.warn("유효하지 않은 리그 데이터:", league);
                 return null;
               }
 
@@ -152,12 +152,12 @@ const SignupPage = () => {
 
           if (getLeagueList.length > 0) {
             setLeagues([...leagues, ...getLeagueList]); // 기존 샘플 데이터를 대체
-            console.log(
-              `${getLeagueList.length}개의 리그 데이터를 로드했습니다.`
-            );
+            // console.log(
+            //   `${getLeagueList.length}개의 리그 데이터를 로드했습니다.`
+            // );
           }
         } else {
-          console.warn("리그 목록 API 응답 예외 오류 발생");
+          // console.warn("리그 목록 API 응답 예외 오류 발생");
         }
       } catch (error) {}
     };
@@ -340,14 +340,14 @@ const SignupPage = () => {
         const teamData = res.data;
 
         if (!teamData || !Array.isArray(teamData)) {
-          console.warn("유효하지 않은 팀 API 응답:", teamData);
+          // console.warn("유효하지 않은 팀 API 응답:", teamData);
           return [];
         }
 
         const getTeamList = teamData
           .map((team: Team) => {
             if (!team || typeof team.teamId === "undefined") {
-              console.warn("유효하지 않은 팀 데이터:", team);
+              // console.warn("유효하지 않은 팀 데이터:", team);
               return null;
             }
 
@@ -361,18 +361,18 @@ const SignupPage = () => {
             ...prev,
             [leagueId]: getTeamList,
           }));
-          console.log(`${getTeamList.length}개의 팀 데이터를 로드했습니다.`);
+          // console.log(`${getTeamList.length}개의 팀 데이터를 로드했습니다.`);
           return getTeamList;
         } else {
-          console.log("해당 리그에 팀 데이터가 없습니다.");
+          // console.log("해당 리그에 팀 데이터가 없습니다.");
           return [];
         }
       } else {
-        console.warn("팀 목록 API 응답 예외 오류 발생");
+        // console.warn("팀 목록 API 응답 예외 오류 발생");
         return [];
       }
     } catch (error) {
-      console.error("팀 목록 API 호출 중 오류 발생:", error);
+      // console.error("팀 목록 API 호출 중 오류 발생:", error);
       return [];
     }
   };
@@ -435,7 +435,7 @@ const SignupPage = () => {
         }),
       });
 
-      console.log("이메일 인증 API 응답:", response);
+      // console.log("이메일 인증 API 응답:", response);
 
       if (typeof response !== "string" && response.statusCode === "FO-200") {
         const authCode = response.data as string;
@@ -448,7 +448,7 @@ const SignupPage = () => {
         alert("이메일 인증 요청에 실패했습니다. 다시 시도해주세요.");
       }
     } catch (error) {
-      console.error("이메일 인증 API 오류:", error);
+      // console.error("이메일 인증 API 오류:", error);
       alert("이메일 인증 요청 중 오류가 발생했습니다.");
     }
   };
@@ -481,16 +481,16 @@ const SignupPage = () => {
     const newErrors: FormErrors = {};
 
     // 디버깅을 위한 로그
-    console.log(
-      "유효성 검사 - leagueId:",
-      formData.leagueId,
-      typeof formData.leagueId
-    );
-    console.log(
-      "유효성 검사 - teamId:",
-      formData.teamId,
-      typeof formData.teamId
-    );
+    // console.log(
+    //   "유효성 검사 - leagueId:",
+    //   formData.leagueId,
+    //   typeof formData.leagueId
+    // );
+    // console.log(
+    //   "유효성 검사 - teamId:",
+    //   formData.teamId,
+    //   typeof formData.teamId
+    // );
 
     // 이메일 검증
     if (!formData.email) {
@@ -593,11 +593,11 @@ const SignupPage = () => {
       .padStart(2, "0")}${formData.birthDay.toString().padStart(2, "0")}`;
 
     // 디버깅을 위한 로그
-    console.log("생년월일 디버깅:");
-    console.log("birthYear:", formData.birthYear, typeof formData.birthYear);
-    console.log("birthMonth:", formData.birthMonth, typeof formData.birthMonth);
-    console.log("birthDay:", formData.birthDay, typeof formData.birthDay);
-    console.log("생성된 birthDate:", birthDate, "길이:", birthDate.length);
+    // console.log("생년월일 디버깅:");
+    // console.log("birthYear:", formData.birthYear, typeof formData.birthYear);
+    // console.log("birthMonth:", formData.birthMonth, typeof formData.birthMonth);
+    // console.log("birthDay:", formData.birthDay, typeof formData.birthDay);
+    // console.log("생성된 birthDate:", birthDate, "길이:", birthDate.length);
 
     // 생년월일 형식 재검증
     if (
@@ -637,18 +637,18 @@ const SignupPage = () => {
       marketingAgreement: formData.marketingAgreement === "y" ? "y" : "n",
     };
 
-    console.log("전송할 회원가입 데이터:", requestData);
-    console.log(
-      "리그/팀 선택 확인 - leagueId:",
-      formData.leagueId,
-      "teamId:",
-      formData.teamId,
-      "leagueId2:",
-      formData.leagueId2,
-      "teamId2:",
-      formData.teamId2
-    );
-    console.log("선택된 팀들:", selectedTeams);
+    // console.log("전송할 회원가입 데이터:", requestData);
+    // console.log(
+    //   "리그/팀 선택 확인 - leagueId:",
+    //   formData.leagueId,
+    //   "teamId:",
+    //   formData.teamId,
+    //   "leagueId2:",
+    //   formData.leagueId2,
+    //   "teamId2:",
+    //   formData.teamId2
+    // );
+    // console.log("선택된 팀들:", selectedTeams);
 
     try {
       const response = await execute("/api/v1/member/regist", {
@@ -659,7 +659,7 @@ const SignupPage = () => {
         body: JSON.stringify(requestData),
       });
 
-      console.log("회원가입 API 응답:", response);
+      // console.log("회원가입 API 응답:", response);
 
       if (typeof response !== "string" && response.statusCode === "FO-200") {
         // 회원가입 성공
@@ -674,7 +674,7 @@ const SignupPage = () => {
         setShowErrorDialog(true);
       }
     } catch (error) {
-      console.error("회원가입 API 오류:", error);
+      // console.error("회원가입 API 오류:", error);
       alert("회원가입 중 오류가 발생했습니다.");
     }
   };

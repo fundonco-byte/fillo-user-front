@@ -21,10 +21,10 @@ const Navbar = () => {
   // 세션 업데이트 시 디버깅 로그
   React.useEffect(() => {
     if (session?.user?.profileImage) {
-      console.log(
-        "Navbar에서 감지된 프로필 이미지:",
-        session.user.profileImage
-      );
+      // console.log(
+      //   "Navbar에서 감지된 프로필 이미지:",
+      //   session.user.profileImage
+      // );
     }
   }, [session?.user?.profileImage]);
 
@@ -149,13 +149,15 @@ const Navbar = () => {
                         }
                         className="w-10 h-10 rounded-full flex items-center justify-center mx-auto cursor-pointer hover:scale-105 transition-transform shadow-md object-cover"
                         alt="Profile"
-                        onLoad={() =>
-                          console.log(
-                            "프로필 이미지 로드됨:",
-                            session.user?.profileImage || session.user?.image
-                          )
-                        }
-                        onError={() => console.log("프로필 이미지 로드 실패")}
+                        onLoad={() => {
+                          // console.log(
+                          //   "프로필 이미지 로드됨:",
+                          //   session.user?.profileImage || session.user?.image
+                          // );
+                        }}
+                        onError={() => {
+                          // console.log("프로필 이미지 로드 실패");
+                        }}
                       />
                     ) : (
                       <div className="cursor-pointer hover:scale-105 transition-transform">

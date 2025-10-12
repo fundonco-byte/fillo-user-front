@@ -7,7 +7,7 @@ export interface NoticeTextBalloonProps {
 }
 
 export const NoticeTextBalloon = ({ isOpen, text }: NoticeTextBalloonProps) => {
-  console.log(isOpen);
+  // console.log(isOpen);
 
   return (
     <div

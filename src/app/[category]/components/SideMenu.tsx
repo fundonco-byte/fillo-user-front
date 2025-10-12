@@ -173,8 +173,8 @@ const SideMenu: React.FC<SideMenuProps> = ({
   const { updateTempFilter } = useFilterContext();
 
   const selectedCategory = propSelectedCategory || contextSelectedCategory;
-  console.log("selectedCategory : " + selectedCategory);
-  console.log("contextSelectedCategory : ", contextSelectedCategory);
+  // console.log("selectedCategory : " + selectedCategory);
+  // console.log("contextSelectedCategory : ", contextSelectedCategory);
 
   const handleItemClick = (category: string) => {
     // Context를 통해 선택된 카테고리 업데이트

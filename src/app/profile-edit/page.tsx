@@ -220,7 +220,7 @@ export default function ProfileEditPage() {
         setSelectedTeams(teams);
       }
     } catch (error) {
-      console.error("사용자 정보 가져오기 오류:", error);
+      // console.error("사용자 정보 가져오기 오류:", error);
     }
   };
 
@@ -236,7 +236,7 @@ export default function ProfileEditPage() {
         setLeagues(data);
       }
     } catch (error) {
-      console.error("리그 데이터 가져오기 오류:", error);
+      // console.error("리그 데이터 가져오기 오류:", error);
     }
   };
 
@@ -270,7 +270,7 @@ export default function ProfileEditPage() {
       }
       return [];
     } catch (error) {
-      console.error("팀 데이터 가져오기 오류:", error);
+      // console.error("팀 데이터 가져오기 오류:", error);
       return [];
     }
   };
@@ -511,76 +511,76 @@ export default function ProfileEditPage() {
       };
 
       // 데이터 검증 로그
-      console.log("=== 데이터 검증 (서버 형식) ===");
-      console.log(
-        "name:",
-        requestData.name,
-        "(length:",
-        (requestData.name as string).length,
-        ")"
-      );
-      console.log("passwordChangeCheck:", requestData.passwordChangeCheck);
-      console.log(
-        "birthDate:",
-        requestData.birthDate,
-        "(length:",
-        (requestData.birthDate as string).length,
-        ")"
-      );
-      console.log(
-        "leagueId:",
-        requestData.leagueId,
-        "(type:",
-        typeof requestData.leagueId,
-        ")"
-      );
-      console.log("leagueName:", requestData.leagueName);
-      console.log(
-        "teamId:",
-        requestData.teamId,
-        "(type:",
-        typeof requestData.teamId,
-        ")"
-      );
-      console.log("teamName:", requestData.teamName);
-      console.log(
-        "leagueId2:",
-        requestData.leagueId2,
-        "(type:",
-        typeof requestData.leagueId2,
-        ")"
-      );
-      console.log("league2Name:", requestData.league2Name);
-      console.log(
-        "teamId2:",
-        requestData.teamId2,
-        "(type:",
-        typeof requestData.teamId2,
-        ")"
-      );
-      console.log("team2Name:", requestData.team2Name);
-      console.log("marketingAgreement:", requestData.marketingAgreement);
+      // console.log("=== 데이터 검증 (서버 형식) ===");
+      // console.log(
+      //   "name:",
+      //   requestData.name,
+      //   "(length:",
+      //   (requestData.name as string).length,
+      //   ")"
+      // );
+      // console.log("passwordChangeCheck:", requestData.passwordChangeCheck);
+      // console.log(
+      //   "birthDate:",
+      //   requestData.birthDate,
+      //   "(length:",
+      //   (requestData.birthDate as string).length,
+      //   ")"
+      // );
+      // console.log(
+      //   "leagueId:",
+      //   requestData.leagueId,
+      //   "(type:",
+      //   typeof requestData.leagueId,
+      //   ")"
+      // );
+      // console.log("leagueName:", requestData.leagueName);
+      // console.log(
+      //   "teamId:",
+      //   requestData.teamId,
+      //   "(type:",
+      //   typeof requestData.teamId,
+      //   ")"
+      // );
+      // console.log("teamName:", requestData.teamName);
+      // console.log(
+      //   "leagueId2:",
+      //   requestData.leagueId2,
+      //   "(type:",
+      //   typeof requestData.leagueId2,
+      //   ")"
+      // );
+      // console.log("league2Name:", requestData.league2Name);
+      // console.log(
+      //   "teamId2:",
+      //   requestData.teamId2,
+      //   "(type:",
+      //   typeof requestData.teamId2,
+      //   ")"
+      // );
+      // console.log("team2Name:", requestData.team2Name);
+      // console.log("marketingAgreement:", requestData.marketingAgreement);
 
       // 비밀번호 변경이 체크된 경우에만 비밀번호 필드 추가
       if (formData.passwordChangeCheck === "Y") {
         requestData.password = formData.password.trim();
         requestData.newPassword = formData.newPassword.trim();
-        console.log(
-          "비밀번호 필드 추가됨 - password length:",
-          (requestData.password as string).length,
-          "newPassword length:",
-          (requestData.newPassword as string).length
-        );
+        // console.log(
+        //   "비밀번호 필드 추가됨 - password length:",
+        //   (requestData.password as string).length,
+        //   "newPassword length:",
+        //   (requestData.newPassword as string).length
+        // );
       } else {
-        console.log("비밀번호 변경 안함 - 비밀번호 필드 제외");
+        // console.log("비밀번호 변경 안함 - 비밀번호 필드 제외");
       }
 
       // 디버깅: 전송되는 데이터 로그
-      console.log("=== 회원정보 수정 API 요청 데이터 ===");
-      console.log("Request Data:", requestData);
-      console.log("FormData 객체:", formData);
-      console.log("선택된 리그:", selectedLeagues);
-      console.log("선택된 팀:", selectedTeams);
+      // console.log("=== 회원정보 수정 API 요청 데이터 ===");
+      // console.log("Request Data:", requestData);
+      // console.log("FormData 객체:", formData);
+      // console.log("선택된 리그:", selectedLeagues);
+      // console.log("선택된 팀:", selectedTeams);
 
       // 항상 FormData 사용 (서버가 multipart/form-data를 기대함)
       const formDataToSend = new FormData();
@@ -594,34 +594,34 @@ export default function ProfileEditPage() {
       // 프로필 이미지가 있는 경우 추가
       if (profileImage) {
         formDataToSend.append("profileImage", profileImage);
-        console.log("프로필 이미지 포함하여 전송");
+        // console.log("프로필 이미지 포함하여 전송");
       } else {
-        console.log("프로필 이미지 없이 전송");
+        // console.log("프로필 이미지 없이 전송");
       }
 
       // FormData 내용 로깅
-      console.log("=== FormData 내용 ===");
-      for (const [key, value] of formDataToSend.entries()) {
-        if (value instanceof Blob) {
-          console.log(`${key}:`, "Blob -", value.type, value.size + " bytes");
-        } else {
-          console.log(`${key}:`, value);
-        }
-      }
+      // console.log("=== FormData 내용 ===");
+      // for (const [key, value] of formDataToSend.entries()) {
+      //   if (value instanceof Blob) {
+      //     console.log(`${key}:`, "Blob -", value.type, value.size + " bytes");
+      //   } else {
+      //     console.log(`${key}:`, value);
+      //   }
+      // }
 
       const response = await apiRequest("/api/v1/member/update", {
         method: "PUT",
         body: formDataToSend,
       });
 
-      console.log("=== API 응답 ===");
-      console.log("Response:", response);
-      console.log("Response type:", typeof response);
-      if (typeof response !== "string") {
-        console.log("Status Code:", response?.statusCode);
-        console.log("Status Message:", response?.statusMessage);
-        console.log("Response Data:", response?.data);
-      }
+      // console.log("=== API 응답 ===");
+      // console.log("Response:", response);
+      // console.log("Response type:", typeof response);
+      // if (typeof response !== "string") {
+      //   console.log("Status Code:", response?.statusCode);
+      //   console.log("Status Message:", response?.statusMessage);
+      //   console.log("Response Data:", response?.data);
+      // }
 
       if (
         response &&
@@ -641,18 +641,18 @@ export default function ProfileEditPage() {
             : "") ||
           "회원정보 수정 중 오류가 발생했습니다.";
 
-        console.log("=== 에러 정보 ===");
-        console.log("Error Message:", errorMessage);
-        console.log(
-          "Full Response:",
-          JSON.stringify(response || "no response", null, 2)
-        );
+        // console.log("=== 에러 정보 ===");
+        // console.log("Error Message:", errorMessage);
+        // console.log(
+        //   "Full Response:",
+        //   JSON.stringify(response || "no response", null, 2)
+        // );
 
         setErrorMessage(errorMessage);
         setShowErrorDialog(true);
       }
     } catch (error) {
-      console.error("회원정보 수정 API 오류:", error);
+      // console.error("회원정보 수정 API 오류:", error);
 
       let errorMessage = "회원정보 수정 중 오류가 발생했습니다.";
 

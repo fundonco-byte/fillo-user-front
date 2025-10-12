@@ -55,7 +55,7 @@ const LoginPage = () => {
         }, 100);
       }
     } catch (error) {
-      console.error("로그인 에러:", error);
+      // console.error("로그인 에러:", error);
       setShowErrorModal(true);
       setTimeout(() => {
         emailInputRef.current?.focus();

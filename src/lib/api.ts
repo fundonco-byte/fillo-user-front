@@ -47,7 +47,7 @@ export const clearAuthTokens = () => {
     );
     keysToRemove.forEach((key) => localStorage.removeItem(key));
 
-    console.log("[clearAuthTokens] 모든 토큰 및 인증 정보 제거 완료");
+    // console.log("[clearAuthTokens] 모든 토큰 및 인증 정보 제거 완료");
   }
 };
 
@@ -62,7 +62,7 @@ export const getAuthTokensFromSession = async (): Promise<AuthTokens> => {
       };
     }
   } catch (error) {
-    console.error("세션에서 토큰을 가져오는 중 오류:", error);
+    // console.error("세션에서 토큰을 가져오는 중 오류:", error);
   }
 
   // fallback: localStorage에서 토큰 로드
@@ -196,13 +196,13 @@ export const apiRequest = async <T = unknown>(
         if (contentType && contentType.includes("application/json")) {
           const errorData = await response.json();
           errorBody = JSON.stringify(errorData);
-          console.error("API 에러 응답:", errorData);
+          // console.error("API 에러 응답:", errorData);
         } else {
           errorBody = await response.text();
-          console.error("API 에러 응답 (텍스트):", errorBody);
+          // console.error("API 에러 응답 (텍스트):", errorBody);
         }
       } catch (e) {
-        console.error("에러 응답 파싱 실패:", e);
+        // console.error("에러 응답 파싱 실패:", e);
       }
 
       throw new Error(
