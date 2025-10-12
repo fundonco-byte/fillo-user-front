@@ -516,7 +516,7 @@ export default function ProfileEditPage() {
         "name:",
         requestData.name,
         "(length:",
-        requestData.name.length,
+        (requestData.name as string).length,
         ")"
       );
       console.log("passwordChangeCheck:", requestData.passwordChangeCheck);
@@ -524,7 +524,7 @@ export default function ProfileEditPage() {
         "birthDate:",
         requestData.birthDate,
         "(length:",
-        requestData.birthDate.length,
+        (requestData.birthDate as string).length,
         ")"
       );
       console.log(
@@ -567,9 +567,9 @@ export default function ProfileEditPage() {
         requestData.newPassword = formData.newPassword.trim();
         console.log(
           "비밀번호 필드 추가됨 - password length:",
-          requestData.password.length,
+          (requestData.password as string).length,
           "newPassword length:",
-          requestData.newPassword.length
+          (requestData.newPassword as string).length
         );
       } else {
         console.log("비밀번호 변경 안함 - 비밀번호 필드 제외");
