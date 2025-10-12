@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { apiRequest } from "@/lib/api";
 import { ApiResponse } from "@/types/auth";
 
@@ -13,25 +13,9 @@ export const useApi = <T = unknown>(options: UseApiOptions = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<T | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   const execute = useCallback(
     async (endpoint: string, requestOptions: RequestInit = {}) => {
-      // 이미 로딩 중이면 중복 호출 방지
-      if (loading) {
-        // console.log(`[API 중복 호출 방지] ${endpoint} - 이미 요청 진행 중`);
-        return;
-      }
-
-      // 이전 요청이 있다면 취소
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      // 새로운 AbortController 생성
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
-
       setLoading(true);
       setError(null);
 
@@ -42,10 +26,10 @@ export const useApi = <T = unknown>(options: UseApiOptions = {}) => {
         //   body: requestOptions.body,
         // });
 
-        const response: ApiResponse<T> = await apiRequest<T>(endpoint, {
-          ...requestOptions,
-          signal: abortController.signal,
-        });
+        const response: ApiResponse<T> = await apiRequest<T>(
+          endpoint,
+          requestOptions
+        );
 
         // console.log(`[API 응답] ${endpoint}`, {
         //   statusCode: response.statusCode,
@@ -78,12 +62,6 @@ export const useApi = <T = unknown>(options: UseApiOptions = {}) => {
           throw new Error(errorMessage);
         }
       } catch (err) {
-        // AbortError는 무시
-        if (err instanceof Error && err.name === "AbortError") {
-          // console.log(`[API 요청 취소됨] ${endpoint}`);
-          return;
-        }
-
         // console.error(`[API 호출 실패] ${endpoint}`, err);
         const error = err instanceof Error ? err : new Error("Unknown error");
         setError(error);
@@ -91,10 +69,9 @@ export const useApi = <T = unknown>(options: UseApiOptions = {}) => {
         throw error;
       } finally {
         setLoading(false);
-        abortControllerRef.current = null;
       }
     },
-    [loading, options]
+    [options]
   );
 
   return {
