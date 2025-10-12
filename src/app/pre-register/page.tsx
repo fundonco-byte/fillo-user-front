@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui";
 import { ArrowRight, Users } from "lucide-react";
@@ -15,8 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/Carousel";
-import { useKeenSlider } from "keen-slider/react";
-import "keen-slider/keen-slider.min.css";
+import useEmblaCarousel from "embla-carousel-react";
 
 const feedImages = [
   "/assets/images/feed1.png",
@@ -60,16 +59,157 @@ const PreRegisterPage = () => {
   const D_DAY = 0; // 임시 지정한 사전등록 마감일까지 남은 Day 수
 
   // 활동 소개 이미지 슬라이더 설정
-  const [sliderRef, instanceRef] = useKeenSlider({
-    initial: 0,
-    slideChanged(slider) {
-      setCurrentSlide(slider.track.details.rel);
-    },
-    slides: {
-      perView: "auto",
-      spacing: 16,
-    },
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    dragFree: true,
+    containScroll: "trimSnaps",
   });
+
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const onScroll = useCallback(() => {
+    if (!emblaApi) return;
+    const progress = Math.max(0, Math.min(1, emblaApi.scrollProgress()));
+    setScrollProgress(progress);
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onScroll();
+    emblaApi.on("scroll", onScroll);
+    emblaApi.on("reInit", onScroll);
+    return () => {
+      emblaApi.off("scroll", onScroll);
+      emblaApi.off("reInit", onScroll);
+    };
+  }, [emblaApi, onScroll]);
+
+  const handleScrollbarClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!emblaApi) return;
+      const target = e.target as HTMLElement;
+      if (target.classList.contains("scrollbar-thumb")) return;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(1, x / rect.width));
+
+      emblaApi.scrollTo(percentage * (emblaApi.scrollSnapList().length - 1));
+    },
+    [emblaApi]
+  );
+
+  const handleThumbDrag = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!emblaApi) return;
+
+      const scrollbarElement = e.currentTarget.parentElement!;
+      const startX = e.clientX;
+      const scrollbarRect = scrollbarElement.getBoundingClientRect();
+      const thumbWidth = scrollbarRect.width * 0.3;
+      const startLeft = e.currentTarget.offsetLeft;
+
+      // Get container element
+      const container = emblaApi.containerNode();
+      if (!container) return;
+
+      // Get initial transform value
+      const getTranslateX = (element: HTMLElement) => {
+        const style = window.getComputedStyle(element);
+        const matrix = style.transform;
+        if (matrix === "none") return 0;
+        const values = matrix.match(/matrix.*\((.+)\)/);
+        if (values) {
+          return parseFloat(values[1].split(", ")[4]) || 0;
+        }
+        return 0;
+      };
+
+      const initialTransform = getTranslateX(container);
+
+      // Calculate total scrollable width
+      const containerWidth = container.offsetWidth;
+      const scrollableWidth =
+        container.scrollWidth - container.parentElement!.offsetWidth;
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        if (!container) return;
+
+        const deltaX = moveEvent.clientX - startX;
+        const maxLeft = scrollbarRect.width - thumbWidth;
+        const newLeft = Math.max(0, Math.min(maxLeft, startLeft + deltaX));
+        const percentage = newLeft / maxLeft;
+
+        // Calculate new transform value
+        const translateX = -(percentage * scrollableWidth);
+
+        // Apply transform directly to container
+        container.style.transform = `translate3d(${translateX}px, 0px, 0px)`;
+
+        // Update scrollbar progress state
+        setScrollProgress(percentage);
+      };
+
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    },
+    [emblaApi]
+  );
+
+  const handleThumbTouchDrag = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      if (!emblaApi) return;
+
+      const scrollbarElement = e.currentTarget.parentElement!;
+      const startX = e.touches[0].clientX;
+      const scrollbarRect = scrollbarElement.getBoundingClientRect();
+      const thumbWidth = scrollbarRect.width * 0.3;
+      const startLeft = e.currentTarget.offsetLeft;
+
+      // Get container element
+      const container = emblaApi.containerNode();
+      if (!container) return;
+
+      // Calculate total scrollable width
+      const scrollableWidth =
+        container.scrollWidth - container.parentElement!.offsetWidth;
+
+      const handleTouchMove = (moveEvent: TouchEvent) => {
+        if (!container) return;
+
+        const deltaX = moveEvent.touches[0].clientX - startX;
+        const maxLeft = scrollbarRect.width - thumbWidth;
+        const newLeft = Math.max(0, Math.min(maxLeft, startLeft + deltaX));
+        const percentage = newLeft / maxLeft;
+
+        // Calculate new transform value
+        const translateX = -(percentage * scrollableWidth);
+
+        // Apply transform directly to container
+        container.style.transform = `translate3d(${translateX}px, 0px, 0px)`;
+
+        // Update scrollbar progress state
+        setScrollProgress(percentage);
+      };
+
+      const handleTouchEnd = () => {
+        document.removeEventListener("touchmove", handleTouchMove);
+        document.removeEventListener("touchend", handleTouchEnd);
+      };
+
+      document.addEventListener("touchmove", handleTouchMove);
+      document.addEventListener("touchend", handleTouchEnd);
+    },
+    [emblaApi]
+  );
 
   // 사전 등록 사용자 수 조회
   useEffect(() => {
@@ -510,36 +650,43 @@ const PreRegisterPage = () => {
                   <div className="flex flex-col lg:flex-row items-center justify-center w-full bg-white p-4 sm:p-5 rounded-lg gap-4">
                     {/* 좌측 이미지 슬라이더 영역 */}
                     <div className="flex-1 w-full lg:max-w-xl px-2 sm:px-5">
-                      <div ref={sliderRef} className="keen-slider mb-4">
-                        {activityIntroduceImages.map((image, index) => (
-                          <div
-                            key={index}
-                            className="keen-slider__slide"
-                            style={{ minWidth: "100px", maxWidth: "140px" }}
-                          >
-                            <Image
-                              src={image}
-                              alt={`활동 소개 ${index + 1}`}
-                              width={140}
-                              height={175}
-                              className="object-cover rounded-lg transition-all duration-300"
-                            />
-                          </div>
-                        ))}
+                      <div className="overflow-hidden mb-4" ref={emblaRef}>
+                        <div className="flex gap-4">
+                          {activityIntroduceImages.map((image, index) => (
+                            <div
+                              key={index}
+                              className="flex-shrink-0"
+                              style={{ minWidth: "140px", width: "140px" }}
+                            >
+                              <Image
+                                src={image}
+                                alt={`활동 소개 ${index + 1}`}
+                                width={140}
+                                height={175}
+                                className="object-cover rounded-lg transition-all duration-300 w-full select-none"
+                                draggable={false}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      {/* 스크롤 진행률 바 */}
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      {/* 인터랙티브 스크롤 바 */}
+                      <div
+                        className="w-full bg-gray-300 rounded-full h-1.5 cursor-pointer relative"
+                        onClick={handleScrollbarClick}
+                      >
+                        {/* 드래그 가능한 스크롤 썸 - 고정 크기 30% */}
                         <div
-                          className="bg-brand-primary h-2 rounded-full transition-all duration-300"
+                          className="scrollbar-thumb absolute top-0 h-1.5 bg-brand-primary rounded-full cursor-grab active:cursor-grabbing hover:bg-brand-primary-dark transition-colors"
                           style={{
-                            width: `${
-                              instanceRef.current
-                                ? ((currentSlide + 1) /
-                                    activityIntroduceImages.length) *
-                                  170
-                                : 20
-                            }%`,
+                            width: "30%",
+                            left: `${Math.max(
+                              0,
+                              Math.min(70, scrollProgress * 70)
+                            )}%`,
                           }}
+                          onMouseDown={handleThumbDrag}
+                          onTouchStart={handleThumbTouchDrag}
                         ></div>
                       </div>
                     </div>
