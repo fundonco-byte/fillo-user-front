@@ -121,7 +121,7 @@ const SignupPage = () => {
         const res = response;
 
         // 리그 목록 API 응답 처리
-        if (typeof res !== "string" && res.statusCode === "FO-200") {
+        if (res && typeof res !== "string" && res.statusCode === "FO-200") {
           const leagueData = res.data;
 
           // 응답 데이터 검증
@@ -336,7 +336,7 @@ const SignupPage = () => {
 
       const res = response;
 
-      if (typeof res !== "string" && res.statusCode === "FO-200") {
+      if (res && typeof res !== "string" && res.statusCode === "FO-200") {
         const teamData = res.data;
 
         if (!teamData || !Array.isArray(teamData)) {
@@ -437,7 +437,11 @@ const SignupPage = () => {
 
       // console.log("이메일 인증 API 응답:", response);
 
-      if (typeof response !== "string" && response.statusCode === "FO-200") {
+      if (
+        response &&
+        typeof response !== "string" &&
+        response.statusCode === "FO-200"
+      ) {
         const authCode = response.data as string;
         // 인증 성공
         setAuthCode(authCode);
@@ -661,13 +665,17 @@ const SignupPage = () => {
 
       // console.log("회원가입 API 응답:", response);
 
-      if (typeof response !== "string" && response.statusCode === "FO-200") {
+      if (
+        response &&
+        typeof response !== "string" &&
+        response.statusCode === "FO-200"
+      ) {
         // 회원가입 성공
         setShowSuccessDialog(true);
       } else {
         // 회원가입 실패 - 서버에서 반환한 오류 메시지 표시
         const errorMsg =
-          typeof response !== "string" && response.data
+          response && typeof response !== "string" && response.data
             ? (response.data as string)
             : "회원가입에 실패했습니다. 다시 시도해주세요.";
         setErrorMessage(errorMsg);
