@@ -32,6 +32,9 @@ export default function KakaoChatButton() {
     const initializeChatButton = () => {
       if (!containerRef.current) return;
 
+      // 기존 버튼이 있다면 제거 (중복 방지)
+      containerRef.current.innerHTML = "";
+
       // Kakao SDK가 초기화되어 있는지 확인
       if (window.Kakao && !window.Kakao.isInitialized()) {
         window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
