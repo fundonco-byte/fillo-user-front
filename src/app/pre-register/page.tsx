@@ -487,7 +487,7 @@ const PreRegisterPage = () => {
                 <p className="text-center text-gray-600 font-semibold  mx-auto">
                   오직{" "}
                   <span className="font-bold text-gray-900">스포츠 팬</span>을
-                  대상으로 하는 팬덤 소셜핑 서비스입니다.
+                  대상으로 하는 팬덤 소셜링 서비스입니다.
                 </p>
               </div>
             </div>

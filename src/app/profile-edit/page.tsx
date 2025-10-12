@@ -320,60 +320,87 @@ export default function ProfileEditPage() {
       return;
     }
 
-    setSelectedLeagues((prev) => {
-      const isSelected = prev.includes(leagueId);
-      if (isSelected) {
-        // 이미 선택된 리그인 경우 선택 해제
-        const newSelectedLeagues = prev.filter((id) => id !== leagueId);
-        const newSelectedTeams = selectedTeams.filter(
-          (team) => team.leagueId !== leagueId
-        );
-        setSelectedTeams(newSelectedTeams);
-        updateFormDataFromSelections(newSelectedLeagues, newSelectedTeams);
-        return newSelectedLeagues;
-      } else {
-        // 새로운 리그 선택
-        const newSelectedLeagues = [...prev, leagueId];
+    const isSelected = selectedLeagues.includes(leagueId);
 
-        // 해당 리그의 팀 데이터 로드
-        fetchTeamsForLeague(leagueId);
+    if (isSelected) {
+      // 이미 선택된 리그 해제
+      const newSelectedLeagues = selectedLeagues.filter(
+        (id) => id !== leagueId
+      );
+      const newSelectedTeams = selectedTeams.filter(
+        (team) => team.leagueId !== leagueId
+      );
 
-        setSelectedTeams((prevTeams) => {
-          const newSelectedTeams = prevTeams.filter(
-            (team) => team.leagueId !== leagueId
-          );
-          updateFormDataFromSelections(newSelectedLeagues, newSelectedTeams);
-          return newSelectedTeams;
-        });
-        return newSelectedLeagues;
+      setSelectedLeagues(newSelectedLeagues);
+      setSelectedTeams(newSelectedTeams);
+
+      // formData 업데이트
+      updateFormDataFromSelections(newSelectedLeagues, newSelectedTeams);
+    } else {
+      // 새로운 리그 선택 시 제한 조건 확인
+      if (selectedLeagues.length >= 2) {
+        alert("최대 2개의 리그까지 선택할 수 있습니다.");
+        return;
       }
-    });
+
+      // 동일한 리그에서 2개 팀이 이미 선택된 경우 다른 리그 선택 제한
+      const hasTwoTeamsFromSameLeague = selectedTeams.some((team) => {
+        const teamsFromSameLeague = selectedTeams.filter(
+          (t) => t.leagueId === team.leagueId
+        );
+        return teamsFromSameLeague.length >= 2;
+      });
+
+      if (hasTwoTeamsFromSameLeague) {
+        alert(
+          "동일한 리그에서 2개의 팀을 선택한 경우, 다른 리그를 선택할 수 없습니다."
+        );
+        return;
+      }
+
+      const newSelectedLeagues = [...selectedLeagues, leagueId];
+      setSelectedLeagues(newSelectedLeagues);
+
+      // 해당 리그의 팀 목록 가져오기
+      fetchTeamsForLeague(leagueId);
+    }
   };
 
   // 팀 선택 핸들러
   const handleTeamSelection = (leagueId: number, teamId: number) => {
-    setSelectedTeams((prev) => {
-      const existingTeamIndex = prev.findIndex(
-        (team) => team.leagueId === leagueId && team.teamId === teamId
+    if (teamId === 0) {
+      // "없음" 팀 선택 시 해당 리그의 모든 팀 선택 해제
+      const newSelectedTeams = selectedTeams.filter(
+        (team) => team.leagueId !== leagueId
       );
+      setSelectedTeams(newSelectedTeams);
+      updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
+      return;
+    }
 
-      if (existingTeamIndex !== -1) {
-        // 이미 선택된 팀인 경우 선택 해제
-        const newSelectedTeams = prev.filter(
-          (_, index) => index !== existingTeamIndex
-        );
-        updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
-        return newSelectedTeams;
-      } else {
-        // 새로운 팀 선택 (최대 2개)
-        if (prev.length >= 2) {
-          return prev;
-        }
-        const newSelectedTeams = [...prev, { leagueId, teamId }];
-        updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
-        return newSelectedTeams;
+    // 동일한 리그에서 동일한 팀이 이미 선택되어 있는지 확인
+    const existingTeamIndex = selectedTeams.findIndex(
+      (team) => team.leagueId === leagueId && team.teamId === teamId
+    );
+
+    if (existingTeamIndex >= 0) {
+      // 이미 선택된 팀이면 해제
+      const newSelectedTeams = selectedTeams.filter(
+        (_, index) => index !== existingTeamIndex
+      );
+      setSelectedTeams(newSelectedTeams);
+      updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
+    } else {
+      // 새로운 팀 선택
+      if (selectedTeams.length >= 2) {
+        alert("최대 2개의 팀까지 선택할 수 있습니다.");
+        return;
       }
-    });
+
+      const newSelectedTeams = [...selectedTeams, { leagueId, teamId }];
+      setSelectedTeams(newSelectedTeams);
+      updateFormDataFromSelections(selectedLeagues, newSelectedTeams);
+    }
   };
 
   // 선택된 리그/팀으로 폼 데이터 업데이트
