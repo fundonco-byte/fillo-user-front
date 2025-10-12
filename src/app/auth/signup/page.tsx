@@ -416,8 +416,14 @@ const SignupPage = () => {
     }
 
     try {
+      // [운영]
       // const API_URL = "http://1.234.75.29:8093/api/v1/member/email/authorize";
-      const API_URL = "http://localhost:8093/api/v1/member/email/authorize";
+
+      // [개발]
+      const API_URL = "http://backend:8093/api/v1/member/email/authorize";
+
+      // [로컬]
+      // const API_URL = "http://localhost:8093/api/v1/member/email/authorize";
 
       const response = await execute(API_URL, {
         method: "POST",

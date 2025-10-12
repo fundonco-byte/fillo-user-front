@@ -90,7 +90,16 @@ const PasswordChangePage = () => {
       };
 
       // 직접 fetch를 사용하여 인증 헤더 없이 API 호출
-      const API_BASE_URL = "http://localhost:8093";
+
+      // [운영]
+      // const API_BASE_URL = "http://1.234.75.29:8093";
+
+      // [개발]
+      const API_BASE_URL = "http://backend:8093";
+
+      // [로컬]
+      // const API_BASE_URL = "http://localhost:8093";
+
       const response = await fetch(
         `${API_BASE_URL}/api/v1/member/update/password`,
         {

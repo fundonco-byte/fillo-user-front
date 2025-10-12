@@ -3,8 +3,14 @@
 import { LoginRequest, ApiResponse, AuthTokens } from "@/types/auth";
 import { getSession } from "next-auth/react";
 
+// [운영]
 // const API_BASE_URL = "http://1.234.75.29:8093";
-const API_BASE_URL = "http://localhost:8093";
+
+// [개발]
+const API_BASE_URL = "http://backend:8093";
+
+// [로컬]
+// const API_BASE_URL = "http://localhost:8093";
 
 // 토큰 저장소 (fallback용)
 let authTokens: AuthTokens = {};
