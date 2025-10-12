@@ -698,20 +698,20 @@ export default function ProfileEditPage() {
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 mt-20 mb-20">
-      <div className="w-full max-w-[600px] space-y-10">
+    <div className="min-h-screen bg-white flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 mt-16 sm:mt-20 mb-16 sm:mb-20">
+      <div className="w-full max-w-[600px] space-y-6 sm:space-y-10">
         {/* 헤더 섹션 */}
         <div className="text-center">
-          <div className="flex flex-row items-center justify-center mb-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center mb-3 sm:mb-4 gap-2">
             <Image
               src={"/assets/images/fillo_brand_text.png"}
               alt="Fillo Logo"
               width={115}
               height={58}
-              className="object-contain"
+              className="object-contain w-20 sm:w-24 lg:w-[115px]"
             />
             <h1
-              className="text-[48px] font-extrabold text-[#1a1a1a] mb-2 leading-[62px]"
+              className="text-3xl sm:text-4xl lg:text-[48px] font-extrabold text-[#1a1a1a] leading-tight sm:leading-[62px]"
               style={{ fontFamily: "SUIT" }}
             >
               {" 정보 수정 "}
@@ -719,7 +719,7 @@ export default function ProfileEditPage() {
           </div>
 
           <p
-            className="text-[18px] font-semibold text-[#1a1a1a] leading-[29px]"
+            className="text-sm sm:text-base lg:text-[18px] font-semibold text-[#1a1a1a] leading-relaxed sm:leading-[29px]"
             style={{ fontFamily: "SUIT" }}
           >
             개인 정보를 수정할 수 있습니다.
@@ -727,34 +727,34 @@ export default function ProfileEditPage() {
         </div>
 
         {/* 회원정보 수정 폼 */}
-        <form className="space-y-8" onSubmit={handleSubmit}>
+        <form className="space-y-6 sm:space-y-8" onSubmit={handleSubmit}>
           {/* 프로필 이미지 섹션 - 회원가입 페이지에는 없지만 추가 */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <h3
-                className="text-[20px] font-semibold text-[#1a1a1a] mb-4"
+                className="text-base sm:text-lg lg:text-[20px] font-semibold text-[#1a1a1a] mb-3 sm:mb-4"
                 style={{ fontFamily: "SUIT" }}
               >
                 프로필 이미지
               </h3>
-              <div className="flex items-center space-x-6">
+              <div className="flex flex-col sm:flex-row items-center sm:space-x-6 space-y-4 sm:space-y-0">
                 <div className="relative">
                   {profileImagePreview ? (
                     <img
                       src={profileImagePreview}
                       alt="프로필 미리보기"
-                      className="w-32 h-32 rounded-full object-cover"
+                      className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover"
                     />
                   ) : (
                     <DefaultProfile size="2xl" />
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 w-full sm:w-auto">
                   <label className="cursor-pointer">
-                    <div className="flex items-center space-x-2 px-4 py-2 border border-[#9400ea] rounded-lg bg-white text-[#9400ea] hover:bg-[#f3e6fc] transition-colors">
+                    <div className="flex items-center justify-center sm:justify-start space-x-2 px-4 py-2.5 sm:py-2 border border-[#9400ea] rounded-lg bg-white text-[#9400ea] hover:bg-[#f3e6fc] transition-colors">
                       <Upload className="w-4 h-4" />
                       <span
-                        className="text-[14px] font-medium"
+                        className="text-sm sm:text-[14px] font-medium"
                         style={{ fontFamily: "SUIT" }}
                       >
                         이미지 업로드
@@ -768,7 +768,7 @@ export default function ProfileEditPage() {
                     />
                   </label>
                   <p
-                    className="text-[12px] text-[#666666] mt-2"
+                    className="text-xs sm:text-[12px] text-[#666666] mt-2 text-center sm:text-left"
                     style={{ fontFamily: "SUIT" }}
                   >
                     JPG, PNG 파일만 업로드 가능합니다.
@@ -782,16 +782,16 @@ export default function ProfileEditPage() {
           <div className="border-t border-[#f3e6fc]"></div>
 
           {/* 이메일 인증 섹션 */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <h3
-                className="text-[20px] font-semibold text-[#1a1a1a] mb-2"
+                className="text-base sm:text-lg lg:text-[20px] font-semibold text-[#1a1a1a] mb-2"
                 style={{ fontFamily: "SUIT" }}
               >
                 아이디
               </h3>
               <p
-                className="text-[12px] text-[#1a1a1a] mb-1"
+                className="text-xs sm:text-[12px] text-[#1a1a1a] mb-1"
                 style={{ fontFamily: "SUIT" }}
               >
                 이메일은 변경하실 수 없습니다.
@@ -803,7 +803,7 @@ export default function ProfileEditPage() {
                   value={formData.email}
                   readOnly
                   placeholder="이메일 주소를 입력하세요."
-                  className="flex-1 h-[48px] px-4 border border-[#dddddd] rounded-lg bg-[#f5f5f5] text-[18px] placeholder-[#999999] cursor-not-allowed"
+                  className="flex-1 h-11 sm:h-[48px] px-3 sm:px-4 border border-[#dddddd] rounded-lg bg-[#f5f5f5] text-sm sm:text-base lg:text-[18px] placeholder-[#999999] cursor-not-allowed"
                   style={{ fontFamily: "SUIT" }}
                 />
               </div>
@@ -811,25 +811,25 @@ export default function ProfileEditPage() {
           </div>
 
           {/* 비밀번호 섹션 */}
-          <div className="space-y-4 mb-10">
+          <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
             <div>
               <h3
-                className="text-[20px] font-semibold text-[#1a1a1a] mb-2"
+                className="text-base sm:text-lg lg:text-[20px] font-semibold text-[#1a1a1a] mb-2"
                 style={{ fontFamily: "SUIT" }}
               >
                 비밀번호 변경
               </h3>
               <p
-                className="text-[12px] text-[#1a1a1a] mb-4"
+                className="text-xs sm:text-[12px] text-[#1a1a1a] mb-3 sm:mb-4"
                 style={{ fontFamily: "SUIT" }}
               >
                 영문, 숫자, 특수문자 포함 8~20자까지 입력하세요.
               </p>
 
               {/* 비밀번호 변경 체크박스 */}
-              <div className="relative flex flex-row items-center justify-between mb-6">
+              <div className="relative flex flex-row items-center justify-between mb-4 sm:mb-6">
                 <span
-                  className="text-[16px] text-[#000000]"
+                  className="text-sm sm:text-base lg:text-[16px] text-[#000000]"
                   style={{ fontFamily: "SUIT" }}
                 >
                   비밀번호를 변경하시겠습니까?
@@ -862,9 +862,9 @@ export default function ProfileEditPage() {
                 </div>
               </div>
 
-              <div className="space-y-2 mb-8">
+              <div className="space-y-2 mb-6 sm:mb-8">
                 <h4
-                  className="text-[15px] font-semibold text-[#1a1a1a] mb-2"
+                  className="text-sm sm:text-[15px] font-semibold text-[#1a1a1a] mb-2"
                   style={{ fontFamily: "SUIT" }}
                 >
                   현재 비밀번호를 입력하세요.
@@ -878,7 +878,7 @@ export default function ProfileEditPage() {
                     }
                     placeholder="비밀번호를 입력하세요."
                     disabled={formData.passwordChangeCheck === "N"}
-                    className={`w-full h-[48px] px-4 pr-12 border rounded-lg text-[18px] placeholder-[#999999] ${
+                    className={`w-full h-11 sm:h-[48px] px-3 sm:px-4 pr-10 sm:pr-12 border rounded-lg text-sm sm:text-base lg:text-[18px] placeholder-[#999999] ${
                       formData.passwordChangeCheck === "N"
                         ? "border-[#dddddd] bg-[#f5f5f5] cursor-not-allowed"
                         : "border-[#9400ea] bg-white focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
@@ -905,7 +905,7 @@ export default function ProfileEditPage() {
 
               <div className="space-y-2">
                 <h4
-                  className="text-[15px] font-semibold text-[#1a1a1a] mb-2"
+                  className="text-sm sm:text-[15px] font-semibold text-[#1a1a1a] mb-2"
                   style={{ fontFamily: "SUIT" }}
                 >
                   변경할 비밀번호를 입력하세요.
@@ -919,7 +919,7 @@ export default function ProfileEditPage() {
                     }
                     placeholder="새 비밀번호를 입력하세요."
                     disabled={formData.passwordChangeCheck === "N"}
-                    className={`w-full h-[48px] px-4 pr-12 border rounded-lg text-[18px] placeholder-[#999999] ${
+                    className={`w-full h-11 sm:h-[48px] px-3 sm:px-4 pr-10 sm:pr-12 border rounded-lg text-sm sm:text-base lg:text-[18px] placeholder-[#999999] ${
                       formData.passwordChangeCheck === "N"
                         ? "border-[#dddddd] bg-[#f5f5f5] cursor-not-allowed"
                         : "border-[#9400ea] bg-white focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
@@ -953,7 +953,7 @@ export default function ProfileEditPage() {
                     }
                     placeholder="새 비밀번호를 다시 입력하세요."
                     disabled={formData.passwordChangeCheck === "N"}
-                    className={`w-full h-[48px] px-4 pr-12 border rounded-lg text-[18px] placeholder-[#999999] ${
+                    className={`w-full h-11 sm:h-[48px] px-3 sm:px-4 pr-10 sm:pr-12 border rounded-lg text-sm sm:text-base lg:text-[18px] placeholder-[#999999] ${
                       formData.passwordChangeCheck === "N"
                         ? "border-[#dddddd] bg-[#f5f5f5] cursor-not-allowed"
                         : formData.newPassword &&
@@ -1016,18 +1016,18 @@ export default function ProfileEditPage() {
           </div>
 
           {/* 약관 동의 섹션 */}
-          <div className="space-y-4">
-            <div className="border border-[#9400ea] rounded-lg p-5 bg-white">
-              <div className="h-[480px] overflow-y-auto">
-                <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="border border-[#9400ea] rounded-lg p-4 sm:p-5 bg-white">
+              <div className="h-[300px] sm:h-[400px] lg:h-[480px] overflow-y-auto">
+                <div className="space-y-3 sm:space-y-4">
                   <h4
-                    className="text-[16px] font-semibold text-[#1a1a1a]"
+                    className="text-sm sm:text-base lg:text-[16px] font-semibold text-[#1a1a1a]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     제1조 (목적)
                   </h4>
                   <p
-                    className="text-[14px] text-[#1a1a1a] leading-[20px]"
+                    className="text-xs sm:text-sm lg:text-[14px] text-[#1a1a1a] leading-relaxed sm:leading-[20px]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     본 약관은 Fillo 서비스(이하 "서비스")의 이용과 관련하여
@@ -1036,13 +1036,13 @@ export default function ProfileEditPage() {
                   </p>
 
                   <h4
-                    className="text-[16px] font-semibold text-[#1a1a1a]"
+                    className="text-sm sm:text-base lg:text-[16px] font-semibold text-[#1a1a1a]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     제2조 (정의)
                   </h4>
                   <p
-                    className="text-[14px] text-[#1a1a1a] leading-[20px]"
+                    className="text-xs sm:text-sm lg:text-[14px] text-[#1a1a1a] leading-relaxed sm:leading-[20px]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     1. "서비스"란 회사가 제공하는 축구 팬 커뮤니티 및 관련
@@ -1057,13 +1057,13 @@ export default function ProfileEditPage() {
                   </p>
 
                   <h4
-                    className="text-[16px] font-semibold text-[#1a1a1a]"
+                    className="text-sm sm:text-base lg:text-[16px] font-semibold text-[#1a1a1a]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     제3조 (개인정보 수집 및 이용)
                   </h4>
                   <p
-                    className="text-[14px] text-[#1a1a1a] leading-[20px]"
+                    className="text-xs sm:text-sm lg:text-[14px] text-[#1a1a1a] leading-relaxed sm:leading-[20px]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     회사는 서비스 제공을 위해 다음과 같은 개인정보를 수집 및
@@ -1078,13 +1078,13 @@ export default function ProfileEditPage() {
                   </p>
 
                   <h4
-                    className="text-[16px] font-semibold text-[#1a1a1a]"
+                    className="text-sm sm:text-base lg:text-[16px] font-semibold text-[#1a1a1a]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     제4조 (마케팅 정보 수신 동의)
                   </h4>
                   <p
-                    className="text-[14px] text-[#1a1a1a] leading-[20px]"
+                    className="text-xs sm:text-sm lg:text-[14px] text-[#1a1a1a] leading-relaxed sm:leading-[20px]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     회사는 이용자의 동의 하에 이메일 및 카카오톡을 통해 마케팅
@@ -1095,10 +1095,10 @@ export default function ProfileEditPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="relative flex flex-row items-center justify-between">
                 <span
-                  className="text-[16px] text-[#000000]"
+                  className="text-sm sm:text-base lg:text-[16px] text-[#000000]"
                   style={{ fontFamily: "SUIT" }}
                 >
                   <span className="text-[#9400ea] font-bold">[필수]</span>{" "}
@@ -1125,10 +1125,10 @@ export default function ProfileEditPage() {
                 </div>
               </div>
 
-              <div className="relative flex flex-row items-center justify-between">
+              <div className="relative flex flex-row items-center justify-between gap-2">
                 <div>
                   <span
-                    className="text-[16px] text-[#000000]"
+                    className="text-sm sm:text-base lg:text-[16px] text-[#000000]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     <span className="font-bold">[선택]</span> 마케팅(이메일) 및
@@ -1178,10 +1178,10 @@ export default function ProfileEditPage() {
           <div className="border-t border-[#f3e6fc]"></div>
 
           {/* 이름 입력 */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <h3
-                className="text-[20px] font-semibold text-[#1a1a1a] mb-4"
+                className="text-base sm:text-lg lg:text-[20px] font-semibold text-[#1a1a1a] mb-3 sm:mb-4"
                 style={{ fontFamily: "SUIT" }}
               >
                 이름
@@ -1191,7 +1191,7 @@ export default function ProfileEditPage() {
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 placeholder="이름 입력"
-                className="w-full h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                className="w-full h-11 sm:h-[48px] px-3 sm:px-4 border border-[#9400ea] rounded-lg bg-white text-sm sm:text-base lg:text-[18px] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
                 style={{ fontFamily: "SUIT" }}
               />
               {errors.name && (
@@ -1206,21 +1206,21 @@ export default function ProfileEditPage() {
           </div>
 
           {/* 성별 선택 */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <h3
-                className="text-[20px] font-semibold text-[#1a1a1a] mb-4"
+                className="text-base sm:text-lg lg:text-[20px] font-semibold text-[#1a1a1a] mb-3 sm:mb-4"
                 style={{ fontFamily: "SUIT" }}
               >
                 성별
               </h3>
               <p
-                className="text-[12px] text-[#666666] mb-4"
+                className="text-xs sm:text-[12px] text-[#666666] mb-3 sm:mb-4"
                 style={{ fontFamily: "SUIT" }}
               >
                 성별은 변경하실 수 없습니다.
               </p>
-              <div className="flex space-x-6">
+              <div className="flex space-x-4 sm:space-x-6">
                 <label className="flex items-center space-x-2 cursor-not-allowed opacity-50">
                   <div className="relative">
                     <input
@@ -1244,7 +1244,7 @@ export default function ProfileEditPage() {
                     )}
                   </div>
                   <span
-                    className="text-[18px] text-[#1a1a1a]"
+                    className="text-sm sm:text-base lg:text-[18px] text-[#1a1a1a]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     남성
@@ -1273,7 +1273,7 @@ export default function ProfileEditPage() {
                     )}
                   </div>
                   <span
-                    className="text-[18px] text-[#1a1a1a]"
+                    className="text-sm sm:text-base lg:text-[18px] text-[#1a1a1a]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     여성
@@ -1284,10 +1284,10 @@ export default function ProfileEditPage() {
           </div>
 
           {/* 생년월일 */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <h3
-                className="text-[20px] font-semibold text-[#1a1a1a] mb-4"
+                className="text-base sm:text-lg lg:text-[20px] font-semibold text-[#1a1a1a] mb-3 sm:mb-4"
                 style={{ fontFamily: "SUIT" }}
               >
                 생년월일
@@ -1302,7 +1302,7 @@ export default function ProfileEditPage() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className="w-full h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    className="w-full h-11 sm:h-[48px] px-3 sm:px-4 border border-[#9400ea] rounded-lg bg-white text-sm sm:text-base lg:text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     <option value="">연도</option>
@@ -1315,7 +1315,7 @@ export default function ProfileEditPage() {
                     )}
                   </select>
                 </div>
-                <div className="w-[92px]">
+                <div className="w-20 sm:w-[92px]">
                   <select
                     value={formData.birthMonth}
                     onChange={(e) =>
@@ -1324,7 +1324,7 @@ export default function ProfileEditPage() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className="w-full h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    className="w-full h-11 sm:h-[48px] px-2 sm:px-4 border border-[#9400ea] rounded-lg bg-white text-sm sm:text-base lg:text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     <option value="">월</option>
@@ -1337,7 +1337,7 @@ export default function ProfileEditPage() {
                     )}
                   </select>
                 </div>
-                <div className="w-[92px]">
+                <div className="w-20 sm:w-[92px]">
                   <select
                     value={formData.birthDay}
                     onChange={(e) =>
@@ -1346,7 +1346,7 @@ export default function ProfileEditPage() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className="w-full h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                    className="w-full h-11 sm:h-[48px] px-2 sm:px-4 border border-[#9400ea] rounded-lg bg-white text-sm sm:text-base lg:text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     <option value="">일</option>
@@ -1370,16 +1370,16 @@ export default function ProfileEditPage() {
           </div>
 
           {/* 응원팀 선택 섹션 */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <h3
-                className="text-[20px] font-semibold text-[#1a1a1a] mb-2"
+                className="text-base sm:text-lg lg:text-[20px] font-semibold text-[#1a1a1a] mb-2"
                 style={{ fontFamily: "SUIT" }}
               >
                 응원팀(중복 선택 가능)
               </h3>
               <p
-                className="text-[12px] text-[#666666] mb-4"
+                className="text-xs sm:text-[12px] text-[#666666] mb-3 sm:mb-4"
                 style={{ fontFamily: "SUIT" }}
               >
                 • 최대 2개의 팀까지 선택 가능합니다.
@@ -1388,7 +1388,7 @@ export default function ProfileEditPage() {
               </p>
 
               {/* 리그 선택 그리드 */}
-              <div className="grid grid-cols-5 gap-4 mb-6">
+              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-4 sm:mb-6">
                 {/* API로 가져온 리그 목록 표시 */}
                 {leagues.map((league) => {
                   const isSelected = selectedLeagues.includes(league.leagueId);
@@ -1408,11 +1408,11 @@ export default function ProfileEditPage() {
                   return (
                     <div
                       key={league.leagueId}
-                      className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                      className={`flex flex-col items-center p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
                         isDisabled ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
-                      <div className="w-16 h-16 mb-2 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mb-1.5 sm:mb-2 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
                         <Image
                           src={getLeagueImage(league.leagueId)}
                           alt={league.leagueName}
@@ -1422,7 +1422,7 @@ export default function ProfileEditPage() {
                         />
                       </div>
                       <span
-                        className="text-[12px] text-center leading-[17px] mb-2"
+                        className="text-[10px] sm:text-[11px] lg:text-[12px] text-center leading-tight sm:leading-[17px] mb-1.5 sm:mb-2"
                         style={{ fontFamily: "SUIT" }}
                       >
                         {league.leagueName}
@@ -1461,9 +1461,9 @@ export default function ProfileEditPage() {
                   return (
                     <div
                       key={0}
-                      className="flex flex-col items-center p-2 rounded-lg transition-all duration-200"
+                      className="flex flex-col items-center p-1.5 sm:p-2 rounded-lg transition-all duration-200"
                     >
-                      <div className="w-16 h-16 mb-2 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mb-1.5 sm:mb-2 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
                         <Image
                           src="/assets/images/freeagent.png"
                           alt="없음"
@@ -1473,7 +1473,7 @@ export default function ProfileEditPage() {
                         />
                       </div>
                       <span
-                        className="text-[12px] text-center leading-[17px] mb-2"
+                        className="text-[10px] sm:text-[11px] lg:text-[12px] text-center leading-tight sm:leading-[17px] mb-1.5 sm:mb-2"
                         style={{ fontFamily: "SUIT" }}
                       >
                         없음
@@ -1506,9 +1506,9 @@ export default function ProfileEditPage() {
 
               {/* 선택된 리그 표시 */}
               {selectedLeagues.length > 0 && (
-                <div className="mb-4">
+                <div className="mb-3 sm:mb-4">
                   <h4
-                    className="text-[16px] font-semibold text-[#1a1a1a] mb-2"
+                    className="text-sm sm:text-base lg:text-[16px] font-semibold text-[#1a1a1a] mb-2"
                     style={{ fontFamily: "SUIT" }}
                   >
                     선택된 리그:
@@ -1522,7 +1522,7 @@ export default function ProfileEditPage() {
                       return (
                         <span
                           key={leagueId}
-                          className="px-3 py-1 bg-[#9400ea] text-white rounded-full text-[14px]"
+                          className="px-2.5 sm:px-3 py-0.5 sm:py-1 bg-[#9400ea] text-white rounded-full text-xs sm:text-sm lg:text-[14px]"
                           style={{ fontFamily: "SUIT" }}
                         >
                           {league?.leagueName}
@@ -1546,7 +1546,7 @@ export default function ProfileEditPage() {
                       return (
                         <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                           <p
-                            className="text-[12px] text-yellow-800"
+                            className="text-xs sm:text-[12px] text-yellow-800"
                             style={{ fontFamily: "SUIT" }}
                           >
                             ⚠️ 동일한 리그에서 2개의 팀을 선택했으므로 다른
@@ -1562,9 +1562,9 @@ export default function ProfileEditPage() {
 
               {/* 팀 선택 드롭다운 */}
               {selectedLeagues.length > 0 && (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <h4
-                    className="text-[16px] font-semibold text-[#1a1a1a]"
+                    className="text-sm sm:text-base lg:text-[16px] font-semibold text-[#1a1a1a]"
                     style={{ fontFamily: "SUIT" }}
                   >
                     팀 선택 (최대 2개):
@@ -1584,13 +1584,13 @@ export default function ProfileEditPage() {
                     return (
                       <div key={leagueId} className="space-y-2">
                         <label
-                          className="text-[14px] font-medium text-[#1a1a1a]"
+                          className="text-xs sm:text-sm lg:text-[14px] font-medium text-[#1a1a1a]"
                           style={{ fontFamily: "SUIT" }}
                         >
                           {league.leagueName} 팀 선택:
                         </label>
                         <select
-                          className="w-full h-[48px] px-4 border border-[#9400ea] rounded-lg bg-white text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+                          className="w-full h-11 sm:h-[48px] px-3 sm:px-4 border border-[#9400ea] rounded-lg bg-white text-sm sm:text-base lg:text-[18px] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
                           style={{ fontFamily: "SUIT" }}
                           onChange={(e) => {
                             const teamId = parseInt(e.target.value);
@@ -1637,7 +1637,7 @@ export default function ProfileEditPage() {
                                 return (
                                   <span
                                     key={index}
-                                    className="px-3 py-1 bg-[#9400ea] text-white rounded-full text-[14px] flex items-center gap-2"
+                                    className="px-2.5 sm:px-3 py-0.5 sm:py-1 bg-[#9400ea] text-white rounded-full text-xs sm:text-sm lg:text-[14px] flex items-center gap-1 sm:gap-2"
                                     style={{ fontFamily: "SUIT" }}
                                   >
                                     {team?.teamName}
@@ -1649,7 +1649,7 @@ export default function ProfileEditPage() {
                                           teamSelection.teamId
                                         )
                                       }
-                                      className="text-white hover:text-red-200 text-[16px] font-bold"
+                                      className="text-white hover:text-red-200 text-sm sm:text-base lg:text-[16px] font-bold"
                                       aria-label={`${team?.teamName} 선택 해제`}
                                     >
                                       ×
@@ -1668,9 +1668,9 @@ export default function ProfileEditPage() {
 
               {/* 전체 선택된 팀 요약 표시 */}
               {selectedTeams.length > 0 && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
                   <h4
-                    className="text-[16px] font-semibold text-[#1a1a1a] mb-2"
+                    className="text-sm sm:text-base lg:text-[16px] font-semibold text-[#1a1a1a] mb-2"
                     style={{ fontFamily: "SUIT" }}
                   >
                     선택된 팀 요약:
@@ -1689,7 +1689,7 @@ export default function ProfileEditPage() {
                       return (
                         <span
                           key={index}
-                          className="px-3 py-1 bg-[#7a00c7] text-white rounded-full text-[14px]"
+                          className="px-2.5 sm:px-3 py-0.5 sm:py-1 bg-[#7a00c7] text-white rounded-full text-xs sm:text-sm lg:text-[14px]"
                           style={{ fontFamily: "SUIT" }}
                         >
                           {league?.leagueName} - {team?.teamName}
@@ -1698,7 +1698,7 @@ export default function ProfileEditPage() {
                     })}
                   </div>
                   <p
-                    className="text-[12px] text-gray-600 mt-2"
+                    className="text-xs sm:text-[12px] text-gray-600 mt-2"
                     style={{ fontFamily: "SUIT" }}
                   >
                     * 동일한 리그에서 여러 팀을 선택할 수 있습니다.
@@ -1728,7 +1728,7 @@ export default function ProfileEditPage() {
           {/* 회원정보 수정 버튼 */}
           <button
             type="submit"
-            className="w-full h-[54px] bg-[#9400ea] text-white rounded-xl font-semibold text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea] transition-all duration-200"
+            className="w-full h-12 sm:h-[54px] bg-[#9400ea] text-white rounded-xl font-semibold text-sm sm:text-base lg:text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea] transition-all duration-200"
             style={{ fontFamily: "SUIT" }}
           >
             회원정보 수정 완료
@@ -1738,16 +1738,16 @@ export default function ProfileEditPage() {
 
       {/* 에러 다이얼로그 */}
       {showErrorDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 mx-4 max-w-sm w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-5 sm:p-6 mx-4 max-w-sm w-full">
             <h3
-              className="text-lg font-semibold text-[#1a1a1a] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1a1a1a] mb-2 sm:mb-3"
               style={{ fontFamily: "SUIT" }}
             >
               회원정보 수정 실패
             </h3>
             <p
-              className="text-[#1a1a1a] mb-6 whitespace-pre-line"
+              className="text-sm sm:text-base text-[#1a1a1a] mb-5 sm:mb-6 whitespace-pre-line"
               style={{ fontFamily: "SUIT" }}
             >
               {errorMessage}
@@ -1757,7 +1757,7 @@ export default function ProfileEditPage() {
                 setShowErrorDialog(false);
                 setErrorMessage("");
               }}
-              className="w-full h-[48px] bg-[#9400ea] text-white rounded-xl font-semibold text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
+              className="w-full h-11 sm:h-[48px] bg-[#9400ea] text-white rounded-xl font-semibold text-sm sm:text-base lg:text-[16px] hover:bg-[#7a00c7] focus:outline-none focus:ring-2 focus:ring-[#9400ea]"
               style={{ fontFamily: "SUIT" }}
             >
               확인

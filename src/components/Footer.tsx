@@ -8,23 +8,23 @@ const Footer = () => {
   };
   return (
     <footer className="bg-[#fafafa] border-t border-[#dddddd]">
-      <div className="max-w-screen-xl mx-auto px-5 py-8">
-        <div className="flex justify-between items-start">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-5 py-6 sm:py-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-6 lg:gap-0">
           {/* 왼쪽: 로고와 회사 정보 */}
-          <div className="flex flex-col">
-            <h2 className="text-[#1a1a1a] text-xl font-semibold mb-4">
+          <div className="flex flex-col w-full lg:w-auto">
+            <h2 className="text-[#1a1a1a] text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
               Fundon
             </h2>
-            <div className="text-[#999999] text-xs leading-relaxed space-y-1">
+            <div className="text-[#999999] text-xs sm:text-sm leading-relaxed space-y-1">
               <p>대표자명: 박결</p>
-              <p>주소: 서울시 종로구 대학로5길 20-2</p>
+              <p className="break-words">주소: 서울시 종로구 대학로5길 20-2</p>
               <p>연락처: 010-3489-7828</p>
-              <p>e-mail: xxcc9876@naver.com</p>
+              <p className="break-all">e-mail: xxcc9876@naver.com</p>
               {/* <p>카카오 문의:</p> */}
             </div>
 
             {/* 소셜 미디어 아이콘 */}
-            <div className="flex space-x-2 mt-4">
+            <div className="flex space-x-2 mt-4 sm:mt-6">
               {/* Instagram */}
               <button
                 onClick={() =>
@@ -32,11 +32,11 @@ const Footer = () => {
                     "https://www.instagram.com/fundon_official/"
                   )
                 }
-                className="w-10 h-10 bg-[#f0f0f0] border border-[#e4e4e4] rounded-full flex items-center justify-center hover:bg-[#E4405F] hover:border-[#E4405F] transition-all duration-200 group"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#f0f0f0] border border-[#e4e4e4] rounded-full flex items-center justify-center hover:bg-[#E4405F] hover:border-[#E4405F] transition-all duration-200 group"
                 aria-label="Instagram"
               >
                 <svg
-                  className="w-5 h-5 text-[#666666] group-hover:text-white transition-colors duration-200"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-[#666666] group-hover:text-white transition-colors duration-200"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -49,11 +49,11 @@ const Footer = () => {
                 onClick={() =>
                   handleSocialClick("https://www.youtube.com/@Fundon4824")
                 }
-                className="w-10 h-10 bg-[#f0f0f0] border border-[#e4e4e4] rounded-full flex items-center justify-center hover:bg-[#FF0000] hover:border-[#FF0000] transition-all duration-200 group"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#f0f0f0] border border-[#e4e4e4] rounded-full flex items-center justify-center hover:bg-[#FF0000] hover:border-[#FF0000] transition-all duration-200 group"
                 aria-label="YouTube"
               >
                 <svg
-                  className="w-5 h-5 text-[#666666] group-hover:text-white transition-colors duration-200"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-[#666666] group-hover:text-white transition-colors duration-200"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -68,11 +68,11 @@ const Footer = () => {
                     "https://www.notion.so/fundon-playus/Welcome-to-Fundon-9e00b7af274840528d9d08971011d331"
                   )
                 }
-                className="w-10 h-10 bg-[#f0f0f0] border border-[#e4e4e4] rounded-full flex items-center justify-center hover:bg-[#000000] hover:border-[#000000] transition-all duration-200 group"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#f0f0f0] border border-[#e4e4e4] rounded-full flex items-center justify-center hover:bg-[#000000] hover:border-[#000000] transition-all duration-200 group"
                 aria-label="Notion"
               >
                 <svg
-                  className="w-5 h-5 text-[#666666] group-hover:text-white transition-colors duration-200"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-[#666666] group-hover:text-white transition-colors duration-200"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -83,16 +83,17 @@ const Footer = () => {
           </div>
 
           {/* 오른쪽: 링크들과 저작권 */}
-          <div className="flex flex-col items-end">
-            <div className="flex space-x-8 mb-4">
-              <button className="text-[#555555] text-base font-semibold hover:text-[#1a1a1a] transition-colors">
+          <div className="flex flex-col items-start lg:items-end w-full lg:w-auto">
+            <div className="flex flex-wrap gap-3 sm:gap-4 lg:space-x-6 lg:gap-0 mb-3 sm:mb-4">
+              <button className="text-[#555555] text-sm sm:text-base font-semibold hover:text-[#1a1a1a] transition-colors">
                 이용안내
               </button>
-              <button className="text-[#555555] text-base font-semibold hover:text-[#1a1a1a] transition-colors">
+              <span className="hidden lg:inline text-[#dddddd]">|</span>
+              <button className="text-[#555555] text-sm sm:text-base font-semibold hover:text-[#1a1a1a] transition-colors">
                 개인정보처리방침
               </button>
             </div>
-            <p className="text-[#999999] text-[15px]">
+            <p className="text-[#999999] text-xs sm:text-sm lg:text-[15px]">
               © Fundon. All rights reserved.
             </p>
           </div>

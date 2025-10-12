@@ -193,55 +193,58 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Filter className="h-5 w-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-900">필터</h3>
-          <span className="text-sm text-gray-500">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center space-x-1.5 sm:space-x-2">
+          <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+            필터
+          </h3>
+          <span className="text-xs sm:text-sm text-gray-500">
             ({totalMeetings}개 모임)
           </span>
         </div>
         {hasActiveFilters && (
           <button
             onClick={clearAllFilters}
-            className="flex items-center space-x-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="flex items-center space-x-1 text-xs sm:text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
-            <X className="h-4 w-4" />
-            <span>전체 초기화</span>
+            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">전체 초기화</span>
+            <span className="sm:hidden">초기화</span>
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
         {(["region", "ageGroup", "category", "period"] as const).map(
           (filterType) => (
             <div key={filterType} className="relative">
               <button
                 onClick={() => toggleDropdown(filterType)}
-                className={`w-full px-4 py-3 text-left border rounded-lg hover:border-purple-600 transition-colors flex items-center justify-between ${
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-left border rounded-lg hover:border-purple-600 transition-colors flex items-center justify-between ${
                   filters[filterType]
                     ? "border-purple-600 bg-purple-50 text-purple-600"
                     : "border-gray-300 text-gray-700"
                 }`}
               >
-                <span className="text-sm font-medium truncate">
+                <span className="text-xs sm:text-sm font-medium truncate">
                   {getFilterDisplayValue(filterType)}
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
+                  className={`h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform flex-shrink-0 ml-1 ${
                     openDropdown === filterType ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
               {openDropdown === filterType && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-40 sm:max-h-48 overflow-y-auto">
                   {getFilterOptions(filterType).map((option) => (
                     <button
                       key={option}
                       onClick={() => handleFilterSelect(filterType, option)}
-                      className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors ${
+                      className={`w-full px-3 sm:px-4 py-1.5 sm:py-2 text-left text-xs sm:text-sm hover:bg-gray-50 transition-colors ${
                         getFilterDisplayValue(filterType) === option
                           ? "bg-purple-50 text-purple-600 font-medium"
                           : "text-gray-700"
@@ -259,25 +262,25 @@ const FilterSection: React.FC<FilterSectionProps> = ({
 
       {/* 활성 필터 표시 */}
       {hasActiveFilters && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <span>활성 필터:</span>
-            <div className="flex flex-wrap gap-2">
+        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+          <div className="flex items-start space-x-1.5 sm:space-x-2 text-xs sm:text-sm text-gray-600">
+            <span className="flex-shrink-0 mt-0.5">활성 필터:</span>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {Object.entries(filters).map(
                 ([key, value]) =>
                   value && (
                     <span
                       key={key}
-                      className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-xs font-medium"
+                      className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 bg-purple-100 text-purple-600 rounded-full text-[10px] sm:text-xs font-medium"
                     >
                       {getFilterLabel(key as keyof FilterOptions)}: {value}
                       <button
                         onClick={() =>
                           handleFilterSelect(key as keyof FilterOptions, "")
                         }
-                        className="ml-2 hover:text-purple-700"
+                        className="ml-1 sm:ml-2 hover:text-purple-700"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </button>
                     </span>
                   )
