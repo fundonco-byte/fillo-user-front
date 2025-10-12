@@ -29,19 +29,16 @@ export default function KakaoChatButton() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const scriptId = "kakao-sdk";
-    if (!document.getElementById(scriptId)) {
-      const s = document.createElement("script");
-      s.id = scriptId;
-      s.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js";
-      //   s.integrity =
-      //     "sha384-eKjgk3YxvG8qKX2SkcI+4P1yqJQd1orEw1xj8KpS8m8qf3TgVbJtK0dT7P7Q9+6B";
-      s.crossOrigin = "anonymous";
-      s.onload = () => {
-        if (!window.Kakao.isInitialized()) {
-          window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
-        }
+    const initializeChatButton = () => {
+      if (!containerRef.current) return;
 
+      // Kakao SDK가 초기화되어 있는지 확인
+      if (window.Kakao && !window.Kakao.isInitialized()) {
+        window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
+      }
+
+      // 채팅 버튼 생성
+      if (window.Kakao && window.Kakao.Channel) {
         window.Kakao.Channel.createChatButton({
           container: containerRef.current,
           channelPublicId: process.env.NEXT_PUBLIC_KAKAO_CHANNEL_ID,
@@ -50,9 +47,33 @@ export default function KakaoChatButton() {
           shape: "pc",
           title: "question", // "문의하기" 버튼 스타일
         });
+      }
+    };
+
+    const scriptId = "kakao-sdk";
+    const existingScript = document.getElementById(scriptId);
+
+    if (existingScript) {
+      // 스크립트가 이미 로드되어 있으면 바로 버튼 생성
+      initializeChatButton();
+    } else {
+      // 스크립트가 없으면 새로 로드
+      const s = document.createElement("script");
+      s.id = scriptId;
+      s.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js";
+      s.crossOrigin = "anonymous";
+      s.onload = () => {
+        initializeChatButton();
       };
       document.body.appendChild(s);
     }
+
+    // 클린업: 컴포넌트 언마운트 시 컨테이너 내용 비우기
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
+    };
   }, []);
 
   return <div ref={containerRef}></div>;
