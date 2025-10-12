@@ -95,10 +95,10 @@ const PasswordChangePage = () => {
       // const API_BASE_URL = "http://1.234.75.29:8093";
 
       // [개발]
-      const API_BASE_URL = "http://backend:8093";
+      // const API_BASE_URL = "http://backend:8093";
 
       // [로컬]
-      // const API_BASE_URL = "http://localhost:8093";
+      const API_BASE_URL = "http://localhost:8093";
 
       const response = await fetch(
         `${API_BASE_URL}/api/v1/member/update/password`,
