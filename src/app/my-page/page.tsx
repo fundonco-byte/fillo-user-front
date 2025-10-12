@@ -151,7 +151,7 @@ const MyPage = () => {
 
       const res = response;
 
-      if (typeof res !== "string" && res.statusCode === "FO-200") {
+      if (res && typeof res !== "string" && res.statusCode === "FO-200") {
         const userInfo = res.data as UserInfo;
         if (userInfo) {
           // console.log("📊 사용자 정보:", userInfo);
@@ -167,7 +167,7 @@ const MyPage = () => {
         if (res === "Token-Expired") {
           // console.error("사용자 정보 불러오기 실패:", res);
           router.push("/auth/login");
-        } else {
+        } else if (res && typeof res !== "string") {
           // console.error("사용자 정보 불러오기 실패:", res.statusMessage);
         }
       }
