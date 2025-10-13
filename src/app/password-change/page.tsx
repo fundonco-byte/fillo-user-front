@@ -92,10 +92,10 @@ const PasswordChangePage = () => {
       // 직접 fetch를 사용하여 인증 헤더 없이 API 호출
 
       // [운영]
-      // const API_BASE_URL = "http://1.234.75.29:8093";
+      const API_BASE_URL = "http://1.234.75.29:8093";
 
       // [개발]
-      const API_BASE_URL = "http://1.234.75.29:9093";
+      // const API_BASE_URL = "http://1.234.75.29:9093";
 
       // [로컬]
       // const API_BASE_URL = "http://localhost:8093";
