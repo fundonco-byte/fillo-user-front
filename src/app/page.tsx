@@ -10,17 +10,11 @@ export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    // 로그인되지 않은 사용자는 사전등록 페이지로 리다이렉트
-    // if (session === null) {
-    //   router.replace("/pre-register");
-    //   return;
-    // }
-
-    // 사전등록 기간이므로 무조건 사전등록 페이지로 전환시키기
-    // 이후 메인 프로젝트로 전환 시 삭제
-    router.replace("/pre-register");
-  }, [session, router]);
+  // useEffect(() => {
+  //   // 사전등록 기간이므로 무조건 사전등록 페이지로 전환시키기
+  //   // 이후 메인 프로젝트로 전환 시 삭제
+  //   router.replace("/pre-register");
+  // }, [session, router]);
 
   // 세션 로딩 중이거나 로그인되지 않은 경우
   if (session === undefined) {
